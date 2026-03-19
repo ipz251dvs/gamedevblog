@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXEL FORGE — Блог про розробку ігор</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:  #ede5d0;
+  --paper2: #e0d7bf;
+  --paper3: #f4eede;
+  --ink:    #1c1510;
+  --ink2:   #3a3028;
+  --ink3:   #6a5e50;
+  --red:    #8b1a1a;
+  --red2:   #b52b2b;
+  --rust:   #7a4a2a;
+  --border: #bfad8a;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:'Crimson Text',Georgia,serif;font-size:18px;line-height:1.7;
+  overflow-x:hidden;position:relative;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 55% 35% at 10% 15%,rgba(100,70,20,.055) 0%,transparent 70%),
+    radial-gradient(ellipse 35% 55% at 90% 80%,rgba(120,20,20,.045) 0%,transparent 70%);
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:var(--ink);border-bottom:3px double #3a3028;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 52px;height:62px;
+}
+.nav-logo{font-family:'Special Elite',monospace;font-size:21px;color:var(--paper);letter-spacing:4px;cursor:pointer;}
+.nav-logo em{color:var(--red2);font-style:normal;}
+.nav-links{list-style:none;display:flex;gap:32px;}
+.nav-links a{font-family:'Special Elite',monospace;font-size:12px;color:#9a8e7e;text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:var(--paper);}
+.nav-sub{font-family:'Special Elite',monospace;font-size:11px;color:var(--ink);background:var(--paper2);border:1px solid var(--border);padding:7px 18px;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.nav-sub:hover{background:var(--red);color:var(--paper);border-color:var(--red);}
+.scroll-line{position:fixed;top:62px;left:0;height:2px;background:var(--red);z-index:1001;width:0%;transition:width .1s;}
+
+/* HERO */
+#home{min-height:100vh;padding-top:62px;display:flex;align-items:center;border-bottom:2px solid var(--border);position:relative;z-index:1;}
+.hero-wrap{max-width:1120px;margin:0 auto;padding:80px 60px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.hero-eyebrow{font-family:'Special Elite',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--ink3);margin-bottom:22px;display:flex;align-items:center;gap:12px;}
+.hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--red);display:block;}
+.hero-title{font-family:'Special Elite',monospace;font-size:clamp(46px,6.5vw,82px);line-height:1;color:var(--ink);margin-bottom:10px;}
+.hero-title .r{color:var(--red);display:block;}
+.hero-subtitle{font-family:'Crimson Text',serif;font-size:20px;font-style:italic;color:var(--ink3);margin-bottom:28px;line-height:1.5;}
+.hero-desc{font-size:17px;color:var(--ink2);line-height:1.9;margin-bottom:44px;max-width:460px;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-dark{font-family:'Special Elite',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:13px 34px;background:var(--ink);color:var(--paper);border:2px solid var(--ink);cursor:pointer;transition:all .2s;}
+.btn-dark:hover{background:var(--red);border-color:var(--red);}
+.btn-ghost{font-family:'Special Elite',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:13px 34px;background:transparent;color:var(--ink);border:2px solid var(--ink);cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{background:var(--ink);color:var(--paper);}
+.hero-stats{display:flex;gap:40px;flex-wrap:wrap;margin-top:46px;padding-top:30px;border-top:1px solid var(--border);}
+.stat-num{font-family:'Special Elite',monospace;font-size:38px;color:var(--red);line-height:1;}
+.stat-label{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-top:3px;}
+.hero-box{border:2px solid var(--ink);background:var(--paper3);padding:38px;box-shadow:6px 6px 0 var(--ink);position:relative;}
+.hero-box::before{content:'';position:absolute;inset:7px;border:1px solid var(--border);pointer-events:none;}
+.hbox-label{font-family:'VT323',monospace;font-size:14px;letter-spacing:3px;text-transform:uppercase;color:var(--red);border-bottom:1px solid var(--border);padding-bottom:11px;margin-bottom:18px;}
+.hero-box p{font-size:15px;color:var(--ink2);line-height:1.95;margin-bottom:13px;}
+.hero-box p:last-child{margin-bottom:0;}
+.caret{display:inline-block;width:9px;height:17px;background:var(--ink);vertical-align:middle;animation:blink 1s step-end infinite;margin-left:2px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* SHARED */
+section{position:relative;z-index:1;}
+.sw{max-width:1120px;margin:0 auto;padding:96px 60px;}
+.sh{display:flex;align-items:baseline;gap:18px;margin-bottom:60px;}
+.sh-num{font-family:'VT323',monospace;font-size:84px;color:var(--paper2);line-height:1;flex-shrink:0;}
+.sh-eye{font-family:'Special Elite',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:5px;}
+.sh-title{font-family:'Special Elite',monospace;font-size:clamp(24px,3.5vw,42px);color:var(--ink);line-height:1.1;}
+.sh-title em{color:var(--red);font-style:normal;}
+.sh-sub{font-size:16px;color:var(--ink3);line-height:1.7;max-width:540px;margin-top:10px;}
+
+/* ARTICLES */
+#articles{background:var(--paper2);border-top:2px solid var(--border);border-bottom:2px solid var(--border);}
+.art-featured{display:grid;grid-template-columns:1.45fr 1fr;gap:48px;margin-bottom:44px;padding-bottom:44px;border-bottom:1px solid var(--border);}
+.art-card{cursor:pointer;transition:transform .2s;}
+.art-card:hover{transform:translateY(-3px);}
+.art-thumb{width:100%;height:210px;display:flex;align-items:center;justify-content:center;font-size:60px;margin-bottom:22px;position:relative;overflow:hidden;border:2px solid var(--ink);}
+.at-unity{background:linear-gradient(145deg,#1c1c16,#242010);}
+.at-unreal{background:linear-gradient(145deg,#1c1010,#2a1212);}
+.at-godot{background:linear-gradient(145deg,#101c10,#101e10);}
+.at-shader{background:linear-gradient(145deg,#100c1c,#180c28);}
+.at-audio{background:linear-gradient(145deg,#1c1a10,#28220c);}
+.at-optim{background:linear-gradient(145deg,#0c1a1c,#0c2222);}
+.at-tag{position:absolute;bottom:0;left:0;right:0;background:var(--red);color:var(--paper);font-family:'Special Elite',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;}
+.art-meta{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:9px;display:flex;gap:14px;flex-wrap:wrap;}
+.art-title{font-family:'Special Elite',monospace;font-size:20px;color:var(--ink);line-height:1.3;margin-bottom:11px;}
+.art-card.big .art-title{font-size:26px;}
+.art-excerpt{font-size:15px;color:var(--ink2);line-height:1.85;margin-bottom:14px;}
+.art-more{font-family:'Special Elite',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:gap .2s;}
+.art-more:hover{gap:14px;}
+.art-more::after{content:'→';}
+.art-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+
+/* ENGINES */
+#engines{background:var(--paper3);}
+.eng-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+.eng-card{border:2px solid var(--ink);background:var(--paper);padding:34px 26px;box-shadow:4px 4px 0 var(--ink);position:relative;transition:transform .2s,box-shadow .2s;}
+.eng-card:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--ink);}
+.eng-card.rec::before{content:'РЕКОМЕНДОВАНО';position:absolute;top:-1px;right:-1px;background:var(--red);color:var(--paper);font-family:'Special Elite',monospace;font-size:9px;letter-spacing:2px;padding:4px 10px;text-transform:uppercase;}
+.eng-icon{font-size:40px;margin-bottom:14px;display:block;}
+.eng-name{font-family:'Special Elite',monospace;font-size:26px;color:var(--ink);margin-bottom:4px;}
+.eng-ver{font-family:'Special Elite',monospace;font-size:11px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:18px;}
+.eng-desc{font-size:15px;color:var(--ink2);line-height:1.85;margin-bottom:22px;}
+.eng-list{list-style:none;border-top:1px solid var(--border);padding-top:14px;margin-bottom:24px;}
+.eng-list li{font-size:13px;color:var(--ink2);padding:5px 0;border-bottom:1px dashed var(--border);display:flex;gap:8px;align-items:flex-start;}
+.eng-list li::before{content:'—';color:var(--red);flex-shrink:0;}
+.eng-bar-wrap{margin-bottom:9px;}
+.eng-bar-row{display:flex;justify-content:space-between;font-family:'Special Elite',monospace;font-size:10px;letter-spacing:1px;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;}
+.eng-bar{height:3px;background:var(--border);}
+.eng-fill{height:3px;background:var(--ink);animation:growBar 1.4s ease-out forwards;}
+@keyframes growBar{from{width:0;}}
+
+/* TUTORIALS */
+#tutorials{background:var(--paper2);border-top:2px solid var(--border);border-bottom:2px solid var(--border);}
+.tut-layout{display:grid;grid-template-columns:1fr 340px;gap:56px;align-items:start;}
+.tut-list{display:flex;flex-direction:column;}
+.tut-item{display:grid;grid-template-columns:52px 1fr;gap:18px;padding:22px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:padding-left .2s;align-items:start;}
+.tut-item:first-child{border-top:1px solid var(--border);}
+.tut-item:hover{padding-left:8px;}
+.tut-num{font-family:'VT323',monospace;font-size:40px;color:var(--border);line-height:1;}
+.tut-level{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+.lv-easy{color:#4a7a3a;}.lv-mid{color:var(--rust);}.lv-hard{color:var(--red);}
+.tut-title{font-family:'Special Elite',monospace;font-size:17px;color:var(--ink);line-height:1.3;margin-bottom:5px;}
+.tut-desc{font-size:14px;color:var(--ink3);line-height:1.7;margin-bottom:8px;}
+.tut-meta{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:1px;color:var(--ink3);text-transform:uppercase;display:flex;gap:14px;flex-wrap:wrap;}
+.sidebar{display:flex;flex-direction:column;gap:26px;}
+.widget{border:2px solid var(--ink);background:var(--paper3);}
+.widget-head{background:var(--ink);color:var(--paper);font-family:'Special Elite',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:11px 18px;}
+.widget-body{padding:18px;}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:1px;padding:4px 11px;border:1px solid var(--ink);color:var(--ink2);cursor:pointer;text-transform:uppercase;transition:all .15s;}
+.tag:hover{background:var(--ink);color:var(--paper);}
+.res-item{display:flex;gap:11px;padding:9px 0;border-bottom:1px dashed var(--border);cursor:pointer;align-items:flex-start;}
+.res-item:last-child{border-bottom:none;}
+.res-icon{font-size:18px;flex-shrink:0;margin-top:2px;}
+.res-name{font-size:13px;color:var(--ink2);line-height:1.4;}
+.res-type{font-family:'Special Elite',monospace;font-size:9px;letter-spacing:1px;color:var(--ink3);text-transform:uppercase;margin-top:2px;}
+.res-item:hover .res-name{color:var(--red);}
+
+/* ROADMAP */
+#roadmap{background:var(--paper);}
+.rm-wrap{max-width:760px;position:relative;}
+.rm-wrap::before{content:'';position:absolute;left:23px;top:0;bottom:0;width:1px;background:repeating-linear-gradient(to bottom,var(--border) 0,var(--border) 6px,transparent 6px,transparent 12px);}
+.rm-item{display:grid;grid-template-columns:48px 1fr;gap:26px;margin-bottom:50px;align-items:start;}
+.rm-node{width:48px;height:48px;border:2px solid var(--ink);background:var(--paper);flex-shrink:0;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-family:'Special Elite',monospace;font-size:17px;color:var(--red);}
+.rm-phase{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:5px;}
+.rm-title{font-family:'Special Elite',monospace;font-size:21px;color:var(--ink);margin-bottom:9px;}
+.rm-desc{font-size:15px;color:var(--ink2);line-height:1.9;margin-bottom:14px;}
+.rm-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.rm-chip{font-family:'Special Elite',monospace;font-size:9px;letter-spacing:1px;padding:4px 10px;border:1px solid var(--ink);color:var(--ink2);text-transform:uppercase;}
+
+/* DEVLOG */
+#devlog{background:var(--paper2);border-top:2px solid var(--border);border-bottom:2px solid var(--border);}
+.dlog-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.dlog-card{border:2px solid var(--ink);background:var(--paper3);padding:30px;box-shadow:3px 3px 0 var(--ink);transition:transform .2s,box-shadow .2s;cursor:pointer;}
+.dlog-card:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);}
+.dlog-date{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;display:flex;align-items:center;gap:9px;}
+.dlog-date::before{content:'//';color:var(--red);}
+.dlog-title{font-family:'Special Elite',monospace;font-size:19px;color:var(--ink);line-height:1.3;margin-bottom:12px;}
+.dlog-text{font-size:15px;color:var(--ink2);line-height:1.85;margin-bottom:18px;}
+.dlog-foot{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border);}
+.dlog-status{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border:1px solid;}
+.st-prog{color:var(--rust);border-color:var(--rust);}
+.st-done{color:#4a7a3a;border-color:#4a7a3a;}
+.st-plan{color:var(--ink3);border-color:var(--ink3);}
+.dlog-likes{font-family:'Special Elite',monospace;font-size:11px;color:var(--ink3);letter-spacing:1px;}
+
+/* NEWSLETTER */
+#newsletter{background:var(--ink);color:var(--paper);text-align:center;}
+#newsletter .sw{padding:88px 60px;}
+.news-desc{font-size:17px;color:#9a8e7e;line-height:1.8;max-width:500px;margin:0 auto 36px;}
+.news-form{display:flex;max-width:500px;margin:0 auto;}
+.news-input{flex:1;background:rgba(237,229,208,.07);border:2px solid #3a3028;border-right:none;padding:15px 20px;color:var(--paper);font-family:'Crimson Text',serif;font-size:17px;outline:none;transition:border-color .2s;}
+.news-input::placeholder{color:#5a5048;}
+.news-input:focus{border-color:#9a8e7e;}
+.news-btn{font-family:'Special Elite',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:15px 26px;background:var(--red);color:var(--paper);border:2px solid var(--red);cursor:pointer;flex-shrink:0;transition:background .2s;}
+.news-btn:hover{background:var(--red2);border-color:var(--red2);}
+.news-note{margin-top:13px;font-family:'Special Elite',monospace;font-size:10px;letter-spacing:1px;color:#5a5048;text-transform:uppercase;}
+
+/* AUTHOR */
+#author{background:var(--paper3);}
+.author-grid{display:grid;grid-template-columns:280px 1fr;gap:70px;align-items:start;}
+.author-frame{width:260px;height:260px;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:var(--paper2);display:flex;align-items:center;justify-content:center;font-size:88px;position:relative;margin-bottom:22px;}
+.author-frame::after{content:'ФОТО АВТОРА';position:absolute;bottom:0;left:0;right:0;background:var(--ink);color:var(--paper);font-family:'Special Elite',monospace;font-size:9px;letter-spacing:3px;text-align:center;padding:5px;text-transform:uppercase;}
+.author-map{border:2px solid var(--ink);background:var(--paper2);height:155px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.map-lines{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:18px 18px;opacity:.5;}
+.map-cnt{position:relative;text-align:center;z-index:1;}
+.map-pin-e{font-size:26px;display:block;}
+.map-city{font-family:'Special Elite',monospace;font-size:13px;color:var(--ink);letter-spacing:2px;text-transform:uppercase;margin-top:5px;}
+.map-coord{font-family:'Special Elite',monospace;font-size:9px;color:var(--ink3);letter-spacing:1px;margin-top:2px;}
+.a-eye{font-family:'Special Elite',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:9px;}
+.a-name{font-family:'Special Elite',monospace;font-size:46px;color:var(--ink);line-height:1.05;margin-bottom:5px;}
+.a-nick{font-family:'VT323',monospace;font-size:22px;color:var(--ink3);letter-spacing:2px;margin-bottom:22px;}
+.a-bio{font-size:16px;color:var(--ink2);line-height:1.9;margin-bottom:28px;max-width:520px;}
+.ctable{border-collapse:collapse;margin-bottom:26px;width:100%;}
+.ctable td{padding:8px 14px 8px 0;font-size:15px;vertical-align:top;border-bottom:1px dashed var(--border);}
+.ctable td:first-child{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);white-space:nowrap;width:110px;padding-right:22px;}
+.ctable td:last-child{color:var(--ink2);}
+.a-skills{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.a-chip{font-family:'Special Elite',monospace;font-size:9px;letter-spacing:1px;padding:4px 10px;border:1px solid var(--ink);color:var(--ink2);text-transform:uppercase;}
+
+/* FOOTER */
+footer{background:var(--ink);color:#9a8e7e;border-top:3px double #3a3028;}
+.footer-inner{max-width:1120px;margin:0 auto;padding:56px 60px 28px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;}
+.f-logo{font-family:'Special Elite',monospace;font-size:24px;color:var(--paper);letter-spacing:4px;margin-bottom:12px;}
+.f-logo em{color:var(--red2);font-style:normal;}
+.f-tag{font-size:14px;color:#5a5048;line-height:1.7;max-width:270px;}
+.f-col-h{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--paper);border-bottom:1px solid #2e2820;padding-bottom:9px;margin-bottom:16px;}
+.f-links{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.f-links a{font-size:14px;color:#5a5048;text-decoration:none;transition:color .2s;}
+.f-links a:hover{color:var(--red2);}
+.f-bottom{max-width:1120px;margin:0 auto;padding:20px 60px;border-top:1px solid #2a2218;display:flex;justify-content:space-between;align-items:center;}
+.f-copy{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#3a3028;}
+.f-soc{display:flex;gap:22px;}
+.f-soc a{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#3a3028;text-decoration:none;transition:color .2s;}
+.f-soc a:hover{color:var(--red2);}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;z-index:3000;background:var(--paper3);overflow-y:auto;}
+.overlay.open{display:block;}
+.ov-close{position:fixed;top:18px;right:38px;font-family:'Special Elite',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;background:var(--ink);color:var(--paper);border:none;padding:10px 20px;cursor:pointer;z-index:3100;transition:background .2s;}
+.ov-close:hover{background:var(--red);}
+.art-full{max-width:740px;margin:0 auto;padding:78px 40px 110px;}
+.af-tag{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:16px;}
+.af-title{font-family:'Special Elite',monospace;font-size:34px;color:var(--ink);line-height:1.2;margin-bottom:14px;}
+.af-meta{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:1px;color:var(--ink3);text-transform:uppercase;display:flex;gap:18px;flex-wrap:wrap;margin-bottom:36px;padding-bottom:24px;border-bottom:2px solid var(--border);}
+.abody h2{font-family:'Special Elite',monospace;font-size:22px;color:var(--red);margin:40px 0 12px;border-bottom:1px solid var(--border);padding-bottom:7px;}
+.abody h3{font-family:'Special Elite',monospace;font-size:17px;color:var(--ink);margin:26px 0 8px;}
+.abody p{font-size:17px;line-height:1.9;color:var(--ink2);margin-bottom:16px;}
+.abody ul{margin:14px 0 22px;padding-left:22px;}
+.abody ul li{font-size:16px;line-height:1.8;color:var(--ink2);margin-bottom:6px;}
+.abody ul li::marker{color:var(--red);}
+.code-b{background:var(--paper2);border:1px solid var(--border);border-left:3px solid var(--ink);padding:22px 26px;font-family:'VT323',monospace;font-size:17px;color:var(--ink2);margin:24px 0;overflow-x:auto;line-height:1.6;white-space:pre;}
+.cm{color:var(--ink3);}.kw{color:var(--red);}.st{color:var(--rust);}
+.tip-b{border:1px solid var(--border);background:var(--paper2);padding:22px 26px;margin:24px 0;position:relative;}
+.tip-b::before{content:'— ПОРАДА —';font-family:'Special Elite',monospace;font-size:9px;color:var(--red);letter-spacing:3px;display:block;margin-bottom:9px;}
+.tip-b p{font-size:15px;color:var(--ink2);margin:0;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  nav{padding:0 24px;}.nav-links{display:none;}
+  .hero-wrap,.author-grid{grid-template-columns:1fr;}
+  .hero-wrap{padding:60px 36px;gap:40px;}.hero-box{display:none;}
+  .sw{padding:72px 36px;}
+  .art-featured,.art-grid3,.eng-grid,.tut-layout,.dlog-grid,.footer-inner{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+}
+@media(max-width:640px){
+  .hero-title{font-size:46px;}
+  .news-form{flex-direction:column;}
+  .news-input{border-right:2px solid #3a3028;border-bottom:none;}
+  .f-bottom{flex-direction:column;gap:12px;}
+}
+</style>
+</head>
+<body>
+<div class="scroll-line" id="scrollLine"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="scrollTo(0,0)">PIXEL<em>FORGE</em></div>
+  <ul class="nav-links">
+    <li><a href="#home">Головна</a></li>
+    <li><a href="#articles">Статті</a></li>
+    <li><a href="#engines">Движки</a></li>
+    <li><a href="#tutorials">Туторіали</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#devlog">DevLog</a></li>
+    <li><a href="#author">Автор</a></li>
+  </ul>
+  <button class="nav-sub" onclick="document.getElementById('newsletter').scrollIntoView({behavior:'smooth'})">Підписатись</button>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-wrap">
+    <div>
+      <div class="hero-eyebrow">Блог про розробку ігор — з 2021 року</div>
+      <h1 class="hero-title">PIXEL<em class="r">FORGE</em>BLOG</h1>
+      <p class="hero-subtitle">Про те, як ідея перетворюється на гру.</p>
+      <p class="hero-desc">Цей блог — про розробку відеоігор: Unity, Unreal Engine, Godot, написання шейдерів, геймдизайн та шлях від першого рядка коду до готової гри в Steam. Тут немає зайвої теорії — лише практика, реальні приклади та чесний досвід.</p>
+      <div class="hero-btns">
+        <button class="btn-dark" onclick="document.getElementById('articles').scrollIntoView({behavior:'smooth'})">Читати статті</button>
+        <button class="btn-ghost" onclick="document.getElementById('tutorials').scrollIntoView({behavior:'smooth'})">Туторіали</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-num">47+</div><div class="stat-label">Статей</div></div>
+        <div><div class="stat-num">12K</div><div class="stat-label">Читачів</div></div>
+        <div><div class="stat-num">6</div><div class="stat-label">Ігор випущено</div></div>
+        <div><div class="stat-num">3+</div><div class="stat-label">Роки досвіду</div></div>
+      </div>
+    </div>
+    <div class="hero-box">
+      <div class="hbox-label">// Про що цей блог</div>
+      <p>Мене звати Владислав Демчук. Я студент Житомирської політехніки і займаюся розробкою ігор у вільний від навчання час.</p>
+      <p>Розробка ігор — це не чарівництво. Це ремесло, яке можна освоїти крок за кроком. Кожна стаття тут — це відповідь на питання, з яким я сам колись стикнувся.</p>
+      <p>Якщо ти хочеш навчитися робити ігри — ти в правильному місці.<span class="caret"></span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ARTICLES -->
+<section id="articles">
+  <div class="sw">
+    <div class="sh">
+      <div class="sh-num">01</div>
+      <div>
+        <div class="sh-eye">// Свіжі матеріали</div>
+        <h2 class="sh-title">Останні <em>статті</em></h2>
+        <p class="sh-sub">Нові публікації про движки, код, дизайн та монетизацію indie-ігор</p>
+      </div>
+    </div>
+    <div class="art-featured">
+      <div class="art-card big" onclick="openArt('physics')">
+        <div class="art-thumb at-unity">🎮<div class="at-tag">Unity — Фізика</div></div>
+        <div class="art-meta"><span>12 червня 2025</span><span>18 хв читання</span><span>4 200 переглядів</span></div>
+        <h3 class="art-title">Повний гайд по фізиці в Unity 6: Rigidbody, колізії та матеріали</h3>
+        <p class="art-excerpt">Розбираємо все, що потрібно знати про фізичний движок Unity: від базового Rigidbody до налаштування колізій та PhysicMaterial. Реальні приклади з кодом.</p>
+        <a class="art-more" href="#">Читати далі</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:28px;">
+        <div class="art-card" onclick="openArt('blueprints')">
+          <div class="art-thumb at-unreal" style="height:160px;">🔴<div class="at-tag">Unreal Engine</div></div>
+          <div class="art-meta"><span>5 червня 2025</span><span>12 хв</span></div>
+          <h3 class="art-title">Blueprints проти C++ в Unreal Engine 5</h3>
+          <p class="art-excerpt">На реальних прикладах: коли залишатися в Blueprints, а коли переходити на C++.</p>
+          <a class="art-more" href="#">Читати</a>
+        </div>
+        <div class="art-card" onclick="openArt('godot')">
+          <div class="art-thumb at-godot" style="height:160px;">🤖<div class="at-tag">Godot 4</div></div>
+          <div class="art-meta"><span>28 травня 2025</span><span>10 хв</span></div>
+          <h3 class="art-title">Godot 4 у 2025: варто переходити з Unity?</h3>
+          <p class="art-excerpt">Чесний огляд після скандалу з Unity Runtime Fee — що змінилось і чи є сенс переїжджати.</p>
+          <a class="art-more" href="#">Читати</a>
+        </div>
+      </div>
+    </div>
+    <div class="art-grid3">
+      <div class="art-card" onclick="openArt('shaders')">
+        <div class="art-thumb at-shader" style="height:160px;">✨<div class="at-tag">Шейдери HLSL</div></div>
+        <div class="art-meta"><span>20 травня 2025</span><span>22 хв</span></div>
+        <h3 class="art-title">HLSL шейдери в Unity: ефект дощу на склі</h3>
+        <p class="art-excerpt">Практичний туторіал із написання кастомних шейдерів — UV-mapping, Normal Maps та анімації.</p>
+        <a class="art-more" href="#">Читати</a>
+      </div>
+      <div class="art-card" onclick="openArt('audio')">
+        <div class="art-thumb at-audio" style="height:160px;">🎵<div class="at-tag">Аудіо — FMOD</div></div>
+        <div class="art-meta"><span>14 травня 2025</span><span>9 хв</span></div>
+        <h3 class="art-title">FMOD та Unity: музика, що реагує на стан гри</h3>
+        <p class="art-excerpt">Інтеграція FMOD Studio в Unity для динамічного аудіо, яке підсилює атмосферу сцени.</p>
+        <a class="art-more" href="#">Читати</a>
+      </div>
+      <div class="art-card" onclick="openArt('optim')">
+        <div class="art-thumb at-optim" style="height:160px;">⚡<div class="at-tag">Оптимізація</div></div>
+        <div class="art-meta"><span>8 травня 2025</span><span>15 хв</span></div>
+        <h3 class="art-title">Unity Profiler: як знизити навантаження на CPU на 40%</h3>
+        <p class="art-excerpt">Реальний кейс з оптимізації мобільної гри: знаходимо вузькі місця і вимірюємо результат.</p>
+        <a class="art-more" href="#">Читати</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENGINES -->
+<section id="engines">
+  <div class="sw">
+    <div class="sh">
+      <div class="sh-num">02</div>
+      <div>
+        <div class="sh-eye">// Інструменти розробки</div>
+        <h2 class="sh-title">Ігрові <em>движки</em></h2>
+        <p class="sh-sub">Три найпопулярніші движки — детально і чесно, щоб обрати правильний для свого проєкту</p>
+      </div>
+    </div>
+    <div class="eng-grid">
+      <div class="eng-card rec">
+        <span class="eng-icon">🎮</span>
+        <div class="eng-name">Unity</div>
+        <div class="eng-ver">Версія 6.0 LTS · Мова: C#</div>
+        <p class="eng-desc">Найпопулярніший движок серед незалежних розробників. Величезна бібліотека готових ресурсів (Asset Store), відмінна підтримка 2D-ігор та мобільних платформ. Ідеально підходить для початківців.</p>
+        <ul class="eng-list">
+          <li>Найбільша спільнота та документація у світі</li>
+          <li>Asset Store з 60 000+ готових ресурсів</li>
+          <li>Відмінні інструменти для 2D</li>
+          <li>Shader Graph — візуальний редактор шейдерів</li>
+          <li>Легка розробка під мобайл та браузер</li>
+        </ul>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Легкість входу</span><span>82%</span></div><div class="eng-bar"><div class="eng-fill" style="width:82%"></div></div></div>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Продуктивність</span><span>78%</span></div><div class="eng-bar"><div class="eng-fill" style="width:78%"></div></div></div>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Екосистема</span><span>97%</span></div><div class="eng-bar"><div class="eng-fill" style="width:97%"></div></div></div>
+      </div>
+      <div class="eng-card">
+        <span class="eng-icon">🔴</span>
+        <div class="eng-name">Unreal Engine</div>
+        <div class="eng-ver">Версія 5.4 · Мова: C++ / Blueprints</div>
+        <p class="eng-desc">Найпотужніший за графікою движок у світі. Використовується у великих студіях. Blueprints дозволяють створювати логіку без написання коду — зручно для початку.</p>
+        <ul class="eng-list">
+          <li>Nanite — деталізована геометрія без обмежень</li>
+          <li>Lumen — глобальне освітлення в реальному часі</li>
+          <li>Blueprints — візуальне програмування без коду</li>
+          <li>Безкоштовний до $1 млн доходу з гри</li>
+          <li>MetaHuman — реалістичні персонажі</li>
+        </ul>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Легкість входу</span><span>55%</span></div><div class="eng-bar"><div class="eng-fill" style="width:55%"></div></div></div>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Продуктивність</span><span>96%</span></div><div class="eng-bar"><div class="eng-fill" style="width:96%"></div></div></div>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Екосистема</span><span>88%</span></div><div class="eng-bar"><div class="eng-fill" style="width:88%"></div></div></div>
+      </div>
+      <div class="eng-card">
+        <span class="eng-icon">🤖</span>
+        <div class="eng-name">Godot</div>
+        <div class="eng-ver">Версія 4.3 · Мова: GDScript / C#</div>
+        <p class="eng-desc">Повністю безкоштовний і відкритий движок. Легкий (~100 МБ), простий у вивченні. Відмінно підходить для 2D-ігор. GDScript — власна мова, схожа на Python.</p>
+        <ul class="eng-list">
+          <li>Повністю безкоштовний назавжди (ліцензія MIT)</li>
+          <li>GDScript — проста і читабельна мова</li>
+          <li>Найкращий вибір для 2D-ігор</li>
+          <li>Маленький редактор (~100 МБ)</li>
+          <li>Активна спільнота, що швидко зростає</li>
+        </ul>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Легкість входу</span><span>90%</span></div><div class="eng-bar"><div class="eng-fill" style="width:90%"></div></div></div>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Продуктивність</span><span>72%</span></div><div class="eng-bar"><div class="eng-fill" style="width:72%"></div></div></div>
+        <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Екосистема</span><span>70%</span></div><div class="eng-bar"><div class="eng-fill" style="width:70%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TUTORIALS -->
+<section id="tutorials">
+  <div class="sw">
+    <div class="sh">
+      <div class="sh-num">03</div>
+      <div>
+        <div class="sh-eye">// Покрокові гайди</div>
+        <h2 class="sh-title">Туторіали <em>&amp; курси</em></h2>
+        <p class="sh-sub">Від першого скрипта до публікації готової гри — все у зрозумілому форматі з прикладами</p>
+      </div>
+    </div>
+    <div class="tut-layout">
+      <div class="tut-list">
+        <div class="tut-item" onclick="openArt('t1')">
+          <div class="tut-num">01</div>
+          <div>
+            <div class="tut-level lv-easy">🟢 Початківець</div>
+            <div class="tut-title">Unity з нуля: перша 2D-платформерна гра за 7 днів</div>
+            <div class="tut-desc">Крок за кроком від встановлення Unity до готової гри з персонажем, ворогами та публікацією на itch.io. Вихідні файли включено.</div>
+            <div class="tut-meta"><span>⏱ 4.5 год</span><span>Unity 6</span><span>Є вихідники</span></div>
+          </div>
+        </div>
+        <div class="tut-item" onclick="openArt('t2')">
+          <div class="tut-num">02</div>
+          <div>
+            <div class="tut-level lv-easy">🟢 Початківець</div>
+            <div class="tut-title">C# для геймдеву: все необхідне без зайвої теорії</div>
+            <div class="tut-desc">Змінні, умови, цикли, функції, ООП, корутини — пояснено на прикладах ігрової логіки. Жодного «Hello World».</div>
+            <div class="tut-meta"><span>⏱ 3 год</span><span>C# / Unity</span><span>Є завдання</span></div>
+          </div>
+        </div>
+        <div class="tut-item" onclick="openArt('t3')">
+          <div class="tut-num">03</div>
+          <div>
+            <div class="tut-level lv-mid">🟡 Середній</div>
+            <div class="tut-title">AI для ігор: NavMesh, State Machine та поведінка ворогів</div>
+            <div class="tut-desc">Створюємо розумних ворогів: патрулювання → переслідування → атака. Finite State Machine та NavMesh Agent.</div>
+            <div class="tut-meta"><span>⏱ 6 год</span><span>Unity 6</span><span>Є вихідники</span></div>
+          </div>
+        </div>
+        <div class="tut-item" onclick="openArt('t4')">
+          <div class="tut-num">04</div>
+          <div>
+            <div class="tut-level lv-mid">🟡 Середній</div>
+            <div class="tut-title">Мультиплеєр в Unity: Netcode for GameObjects + Relay</div>
+            <div class="tut-desc">Мережева гра без виділеного сервера через Unity Gaming Services. Синхронізація гравців та обробка затримок.</div>
+            <div class="tut-meta"><span>⏱ 8 год</span><span>Unity 6 + UGS</span></div>
+          </div>
+        </div>
+        <div class="tut-item" onclick="openArt('t5')">
+          <div class="tut-num">05</div>
+          <div>
+            <div class="tut-level lv-hard">🔴 Просунутий</div>
+            <div class="tut-title">Compute Shaders в Unity: прискорення симуляцій на GPU</div>
+            <div class="tut-desc">Переносимо важкі обчислення на відеокарту. Симуляція частинок та синхронізація CPU–GPU.</div>
+            <div class="tut-meta"><span>⏱ 10 год</span><span>Unity URP</span><span>GPU</span></div>
+          </div>
+        </div>
+        <div class="tut-item" onclick="openArt('t6')">
+          <div class="tut-num">06</div>
+          <div>
+            <div class="tut-level lv-easy">🟢 Початківець</div>
+            <div class="tut-title">Як опублікувати гру на Steam, itch.io та Google Play</div>
+            <div class="tut-desc">Весь процес від Build Settings до живих сторінок: скріншоти, опис, ціна та перший тиждень продажів.</div>
+            <div class="tut-meta"><span>⏱ 2.5 год</span><span>Всі движки</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar">
+        <div class="widget">
+          <div class="widget-head">Теги</div>
+          <div class="widget-body">
+            <div class="tag-cloud">
+              <span class="tag">Unity</span><span class="tag">Unreal</span><span class="tag">Godot</span>
+              <span class="tag">C#</span><span class="tag">C++</span><span class="tag">GDScript</span>
+              <span class="tag">Шейдери</span><span class="tag">2D</span><span class="tag">3D</span>
+              <span class="tag">Mobile</span><span class="tag">AI/NPC</span><span class="tag">Мережа</span>
+              <span class="tag">Steam</span><span class="tag">itch.io</span><span class="tag">Фізика</span>
+              <span class="tag">Оптимізація</span><span class="tag">Аудіо</span><span class="tag">UI/UX</span>
+            </div>
+          </div>
+        </div>
+        <div class="widget">
+          <div class="widget-head">Корисні ресурси</div>
+          <div class="widget-body">
+            <div class="res-item"><div class="res-icon">🎮</div><div><div class="res-name">Unity Learn — офіційний навчальний портал</div><div class="res-type">Безкоштовно</div></div></div>
+            <div class="res-item"><div class="res-icon">📖</div><div><div class="res-name">Game Programming Patterns — книга Nystrom</div><div class="res-type">Безкоштовно онлайн</div></div></div>
+            <div class="res-item"><div class="res-icon">🎬</div><div><div class="res-name">GDC Talks — 1000+ доповідей розробників</div><div class="res-type">Безкоштовно, YouTube</div></div></div>
+            <div class="res-item"><div class="res-icon">🛠</div><div><div class="res-name">Kenney.nl — безкоштовні 2D та 3D ресурси</div><div class="res-type">Ліцензія CC0</div></div></div>
+            <div class="res-item"><div class="res-icon">🔊</div><div><div class="res-name">Freesound.org — безкоштовні звукові ефекти</div><div class="res-type">Creative Commons</div></div></div>
+          </div>
+        </div>
+        <div class="widget">
+          <div class="widget-head">Найпопулярніше</div>
+          <div class="widget-body">
+            <div class="res-item" onclick="openArt('physics')"><div style="font-family:'Special Elite';font-size:22px;color:var(--red);width:30px;flex-shrink:0;">#1</div><div><div class="res-name">Повний гайд по фізиці в Unity 6</div><div class="res-type">4 200 переглядів</div></div></div>
+            <div class="res-item" onclick="openArt('shaders')"><div style="font-family:'Special Elite';font-size:22px;color:var(--rust);width:30px;flex-shrink:0;">#2</div><div><div class="res-name">HLSL шейдери: ефект дощу на склі</div><div class="res-type">3 800 переглядів</div></div></div>
+            <div class="res-item" onclick="openArt('godot')"><div style="font-family:'Special Elite';font-size:22px;color:var(--ink3);width:30px;flex-shrink:0;">#3</div><div><div class="res-name">Godot 4 у 2025: варто переходити?</div><div class="res-type">3 100 переглядів</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="sw">
+    <div class="sh">
+      <div class="sh-num">04</div>
+      <div>
+        <div class="sh-eye">// Шлях розробника</div>
+        <h2 class="sh-title">Roadmap <em>геймдева</em></h2>
+        <p class="sh-sub">П'ять кроків від абсолютного початківця до indie-розробника, що публікує ігри</p>
+      </div>
+    </div>
+    <div class="rm-wrap">
+      <div class="rm-item">
+        <div class="rm-node">01</div>
+        <div>
+          <div class="rm-phase">Фаза 1 — Фундамент</div>
+          <div class="rm-title">Основи програмування і вибір движка</div>
+          <p class="rm-desc">Перш ніж розробляти ігри, варто засвоїти базові концепції програмування: змінні, умови, цикли, функції та основи об'єктно-орієнтованого підходу. Паралельно обираємо движок — Unity або Godot мають нижчий поріг входу і тисячі навчальних матеріалів.</p>
+          <div class="rm-chips"><span class="rm-chip">C# базовий</span><span class="rm-chip">Інтерфейс Unity</span><span class="rm-chip">GameObject / Component</span><span class="rm-chip">Сцени та об'єкти</span></div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-node">02</div>
+        <div>
+          <div class="rm-phase">Фаза 2 — Перша гра</div>
+          <div class="rm-title">Клон Pong або Breakout за тиждень</div>
+          <p class="rm-desc">Найкращий спосіб навчитися — відтворити щось просте. Pong, Breakout або Snake охоплюють ключові механіки: рух об'єктів, колізії, підрахунок очок та стани гри. Готову гру публікуємо на itch.io для першого зворотного зв'язку від гравців.</p>
+          <div class="rm-chips"><span class="rm-chip">Collider 2D</span><span class="rm-chip">Rigidbody 2D</span><span class="rm-chip">Canvas / UI</span><span class="rm-chip">Звук</span></div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-node">03</div>
+        <div>
+          <div class="rm-phase">Фаза 3 — Архітектура</div>
+          <div class="rm-title">Патерни проєктування та чистий код</div>
+          <p class="rm-desc">Після перших ігор код часто стає «спагеті». Вивчаємо патерни: Singleton для менеджерів, Observer для подій, State Machine для логіки. Правильна архітектура економить десятки годин у майбутньому.</p>
+          <div class="rm-chips"><span class="rm-chip">Singleton</span><span class="rm-chip">Observer</span><span class="rm-chip">State Machine</span><span class="rm-chip">ScriptableObject</span></div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-node">04</div>
+        <div>
+          <div class="rm-phase">Фаза 4 — Спеціалізація</div>
+          <div class="rm-title">Обираємо напрям: графіка, AI або геймплей</div>
+          <p class="rm-desc">Технічний художник вивчає шейдери та VFX. Геймплей-програміст заглиблюється в AI та процедурну генерацію. Мережевий розробник — синхронізацію та серверну архітектуру. Глибина важливіша за широту знань.</p>
+          <div class="rm-chips"><span class="rm-chip">Shader Graph</span><span class="rm-chip">NavMesh AI</span><span class="rm-chip">Netcode</span><span class="rm-chip">VFX Graph</span></div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-node">05</div>
+        <div>
+          <div class="rm-phase">Фаза 5 — Реліз</div>
+          <div class="rm-title">Від прототипу до Steam та App Store</div>
+          <p class="rm-desc">Найважливіша фаза — завершити та опублікувати гру. Сотні розробників застряють у розробці і нічого не випускають. Вивчаємо Steam Direct, підготовку сторінки магазину, маркетинг та аналітику продажів.</p>
+          <div class="rm-chips"><span class="rm-chip">Steam Direct</span><span class="rm-chip">Steamworks SDK</span><span class="rm-chip">Маркетинг</span><span class="rm-chip">Аналітика</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEVLOG -->
+<section id="devlog">
+  <div class="sw">
+    <div class="sh">
+      <div class="sh-num">05</div>
+      <div>
+        <div class="sh-eye">// Щоденник розробки</div>
+        <h2 class="sh-title">Dev<em>Log</em></h2>
+        <p class="sh-sub">Особистий щоденник моїх проєктів — чесно про успіхи, проблеми і висновки</p>
+      </div>
+    </div>
+    <div class="dlog-grid">
+      <div class="dlog-card">
+        <div class="dlog-date">Тиждень 14 · Проєкт «Echoes of Void»</div>
+        <div class="dlog-title">Процедурна генерація підземель: 3 тижні болю і 1 тиждень результату</div>
+        <p class="dlog-text">Нарешті вирішив проблему з алгоритмом BSP для генерації кімнат. Довго боровся з тим, що коридори накладалися на кімнати та руйнували геометрію. Рішення виявилось простим: окремий прохід перевірки перетинів після кожного розміщення кімнати. Тепер генерує 50-кімнатні підземелля за 12 мілісекунд.</p>
+        <div class="dlog-foot"><span class="dlog-status st-prog">В процесі</span><span class="dlog-likes">❤ 142 реакції</span></div>
+      </div>
+      <div class="dlog-card">
+        <div class="dlog-date">Тиждень 8 · Проєкт «Solar Drift»</div>
+        <div class="dlog-title">Перший анонс у Steam: 200 бажань за 3 дні</div>
+        <p class="dlog-text">Опублікував перший трейлер «Solar Drift» — мобільний аркадний шутер. Результат перевершив очікування: 200 wishlists за 3 дні лише від Reddit та Discord. Ключ успіху — трейлер з чітким gameplay loop та унікальна ретро-естетика. Перші відгуки від незнайомих людей — найкраща мотивація продовжувати.</p>
+        <div class="dlog-foot"><span class="dlog-status st-done">Завершено</span><span class="dlog-likes">❤ 287 реакції</span></div>
+      </div>
+      <div class="dlog-card">
+        <div class="dlog-date">Тиждень 2 · Ludum Dare 54</div>
+        <div class="dlog-title">Game Jam: 48 годин, одна людина, одна гра</div>
+        <p class="dlog-text">Участь у Ludum Dare 54 на тему «Обмежений простір». Зробив паззл-гру де гравець маніпулює звуковими хвилями. За 48 годин: 5 рівнів та повноцінний UI. Підсумкова оцінка: Gameplay 3.8/5, Creativity 4.2/5. 23 місце з 1 847 учасників.</p>
+        <div class="dlog-foot"><span class="dlog-status st-done">Завершено</span><span class="dlog-likes">❤ 194 реакції</span></div>
+      </div>
+      <div class="dlog-card">
+        <div class="dlog-date">Тиждень 1 · Новий проєкт</div>
+        <div class="dlog-title">Починаємо roguelite з процедурними рівнями та bullet-hell боями</div>
+        <p class="dlog-text">Новий амбітний проєкт: вид зверху, процедурна генерація, механіки bullet-hell. Натхнення: Enter the Gungeon + Hades. Game Design Document на 40 сторінок готовий. Цільові платформи: PC та Nintendo Switch. Орієнтовний реліз: кінець 2026 року.</p>
+        <div class="dlog-foot"><span class="dlog-status st-plan">Початок</span><span class="dlog-likes">❤ 89 реакції</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section id="newsletter">
+  <div class="sw">
+    <div class="sh" style="justify-content:center;flex-direction:column;align-items:center;gap:6px;">
+      <div class="sh-eye">// Залишайся в курсі</div>
+      <h2 class="sh-title" style="color:var(--paper);">Підписка на <em style="color:var(--red2);">розсилку</em></h2>
+    </div>
+    <p class="news-desc">Щотижневий дайджест: нові статті, оновлення DevLog та корисні ресурси — прямо на пошту. Без спаму, лише геймдев.</p>
+    <div class="news-form">
+      <input type="email" class="news-input" placeholder="ваша@пошта.com" id="emailInput">
+      <button class="news-btn" onclick="subscribe()">Підписатись</button>
+    </div>
+    <div class="news-note" id="subMsg">Без спаму. Відписатись можна будь-коли.</div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section id="author">
+  <div class="sw">
+    <div class="sh">
+      <div class="sh-num">06</div>
+      <div>
+        <div class="sh-eye">// Про автора</div>
+        <h2 class="sh-title">Автор <em>блогу</em></h2>
+      </div>
+    </div>
+    <div class="author-grid">
+      <div>
+        <div class="author-frame">👾</div>
+        <div class="author-map">
+          <div class="map-lines"></div>
+          <div class="map-cnt">
+            <span class="map-pin-e">📍</span>
+            <div class="map-city">Житомир, Україна</div>
+            <div class="map-coord">50.2547° N, 28.6587° E</div>
+            <div class="map-coord" style="margin-top:3px;">вул. Чуднівська, 103</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="a-eye">// Розробник &amp; блогер</div>
+        <div class="a-name">Владислав<br>Демчук</div>
+        <div class="a-nick">@pixelforge_dev</div>
+        <p class="a-bio">Привіт! Мене звати Владислав. Я студент Державного університету «Житомирська політехніка» і займаюся розробкою ігор у вільний від навчання час. Почав з Unity у 2021 році, з того часу випустив шість невеликих проєктів — від мобільних аркад до PC-рогалів.</p>
+        <p class="a-bio">Захоплюсь технічним боком розробки: шейдерами, процедурною генерацією та оптимізацією. Цей блог — мій спосіб ділитися знаннями та фіксувати власний прогрес. Якщо маєш питання — пиши!</p>
+        <table class="ctable">
+          <tr><td>Ім'я</td><td>Владислав Демчук</td></tr>
+          <tr><td>E-mail</td><td>ipz251_dvs@student.ztu.edu.ua</td></tr>
+          <tr><td>Університет</td><td>Державний університет «Житомирська політехніка»</td></tr>
+          <tr><td>Адреса</td><td>м. Житомир, вул. Чуднівська, 103</td></tr>
+          <tr><td>Спеціальність</td><td>Комп'ютерні науки (ІПЗ-25-1)</td></tr>
+          <tr><td>Discord</td><td>pixelforge#4821</td></tr>
+          <tr><td>Itch.io</td><td>itch.io/pixelforge</td></tr>
+        </table>
+        <div class="a-skills">
+          <span class="a-chip">Unity 6</span><span class="a-chip">C#</span>
+          <span class="a-chip">HLSL / ShaderLab</span><span class="a-chip">Shader Graph</span>
+          <span class="a-chip">Godot 4</span><span class="a-chip">Blender</span>
+          <span class="a-chip">Aseprite</span><span class="a-chip">FMOD</span>
+          <span class="a-chip">Git</span><span class="a-chip">Steam SDK</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="f-logo">PIXEL<em>FORGE</em></div>
+      <p class="f-tag">Блог про розробку відеоігор для тих, хто хоче не просто грати — а створювати власні світи.</p>
+    </div>
+    <div>
+      <div class="f-col-h">Розділи</div>
+      <ul class="f-links">
+        <li><a href="#articles">Статті</a></li><li><a href="#engines">Движки</a></li>
+        <li><a href="#tutorials">Туторіали</a></li><li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#devlog">DevLog</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="f-col-h">Теми</div>
+      <ul class="f-links">
+        <li><a href="#">Unity</a></li><li><a href="#">Unreal Engine</a></li>
+        <li><a href="#">Godot 4</a></li><li><a href="#">Шейдери</a></li>
+        <li><a href="#">Монетизація</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="f-col-h">Контакти</div>
+      <ul class="f-links">
+        <li><a href="#">ipz251_dvs@student.ztu.edu.ua</a></li>
+        <li><a href="#">Discord сервер</a></li>
+        <li><a href="#">itch.io профіль</a></li>
+        <li><a href="#">YouTube канал</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="f-bottom">
+    <div class="f-copy">© 2025 PixelForge Blog · Владислав Демчук · Житомирська політехніка</div>
+    <div class="f-soc"><a href="#">YouTube</a><a href="#">Discord</a><a href="#">itch.io</a><a href="#">GitHub</a></div>
+  </div>
+</footer>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <button class="ov-close" onclick="closeArt()">✕ Закрити</button>
+  <div class="art-full" id="artContent"></div>
+</div>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  document.getElementById('scrollLine').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+
+function subscribe(){
+  const v=document.getElementById('emailInput').value;
+  const m=document.getElementById('subMsg');
+  if(!v||!v.includes('@')){m.style.color='#b52b2b';m.textContent='⚠ Введіть коректну email-адресу';return;}
+  m.style.color='#4a7a3a';m.textContent='✓ Дякуємо! Ви підписані на PIXELFORGE BLOG';
+  document.getElementById('emailInput').value='';
+}
+
+const arts={
+  physics:{
+    tag:'Unity · Фізика',
+    title:'Повний гайд по фізиці в Unity 6: Rigidbody, колізії та фізичні матеріали',
+    meta:['12 червня 2025','18 хв читання','4 200 переглядів','Автор: Владислав Демчук'],
+    body:`<h2>Навіщо розуміти фізику?</h2>
+<p>Більшість початківців у Unity просто додають Rigidbody до об'єкта і сподіваються, що «воно само запрацює». Перший час це дійсно так. Але коли гра ускладнюється — персонаж застряє в стінах, об'єкти тремтять, колізії спрацьовують невчасно. Ця стаття допоможе розібратися з фізикою Unity раз і назавжди.</p>
+<h2>Rigidbody: основи та підводні камені</h2>
+<p>Rigidbody — компонент, що передає управління об'єктом фізичному движку. Без нього об'єкт статичний, з ним — підпорядковується гравітації та силам.</p>
+<p><strong>Collision Detection Mode</strong> — критичний параметр. Discrete (за замовчуванням) перевіряє колізії раз на кадр. Для швидких об'єктів (кулі, снаряди) об'єкт може «пролетіти крізь стіну» між кадрами. Варіанти вирішення:</p>
+<ul>
+  <li><strong>Continuous</strong> — перевіряє між кадрами зі статичними колайдерами</li>
+  <li><strong>Continuous Dynamic</strong> — перевіряє і з іншими Rigidbody, але дорожче</li>
+  <li><strong>Continuous Speculative</strong> — найдешевший варіант для більшості задач</li>
+</ul>
+<div class="code-b"><span class="cm">// Правильний спосіб переміщати Rigidbody</span>
+<span class="kw">private</span> Rigidbody rb;
+
+<span class="kw">void</span> Start() {
+    rb = GetComponent&lt;Rigidbody&gt;();
+}
+
+<span class="kw">void</span> FixedUpdate() {
+    <span class="cm">// НЕ використовуй transform.position!</span>
+    Vector3 dir = <span class="kw">new</span> Vector3(
+        Input.GetAxis(<span class="st">"Horizontal"</span>), 0,
+        Input.GetAxis(<span class="st">"Vertical"</span>)
+    );
+    rb.MovePosition(rb.position + dir * speed * Time.fixedDeltaTime);
+}</div>
+<h2>Типи Collider</h2>
+<ul>
+  <li><strong>Box Collider</strong> — найшвидший, ідеальний для платформ</li>
+  <li><strong>Sphere Collider</strong> — другий за швидкістю, для куль і снарядів</li>
+  <li><strong>Capsule Collider</strong> — стандарт для персонажів</li>
+  <li><strong>Mesh Collider</strong> — точний, але повільний. Не використовуй для рухомих об'єктів!</li>
+</ul>
+<div class="tip-b"><p>Використовуй примітивні колайдери замість Mesh Collider. Декілька Box/Sphere Collider на одному об'єкті дешевші, ніж один складний Mesh Collider.</p></div>
+<h2>Physics Materials</h2>
+<p>PhysicMaterial визначає, як два об'єкти взаємодіють при зіткненні. Два ключових параметри: Friction (тертя) та Bounciness (пружність).</p>
+<div class="code-b">PhysicMaterial ice = <span class="kw">new</span> PhysicMaterial(<span class="st">"Ice"</span>);
+ice.dynamicFriction = 0.05f;
+ice.staticFriction  = 0.05f;
+ice.bounciness      = 0.0f;
+ice.frictionCombine = PhysicMaterialCombine.Minimum;
+GetComponent&lt;Collider&gt;().material = ice;</div>
+<h2>Висновки</h2>
+<p>Переміщай об'єкти через FixedUpdate та методи Rigidbody, використовуй примітивні колайдери, налаштовуй Collision Detection Mode відповідно до швидкості об'єктів. Ці прості правила вирішать 90% проблем з фізикою у твоїх іграх.</p>`},
+
+  shaders:{
+    tag:'Шейдери · HLSL',
+    title:'HLSL шейдери в Unity: від нуля до ефекту дощу на склі',
+    meta:['20 травня 2025','22 хв читання','3 800 переглядів','Автор: Владислав Демчук'],
+    body:`<h2>Що таке шейдери?</h2>
+<p>Шейдер — це програма, що виконується на відеокарті (GPU) і визначає, як рендерити кожен піксель. Unity надає Shader Graph для візуального редагування, але код відкриває можливості, яких у графічному редакторі немає.</p>
+<h2>Структура URP-шейдера</h2>
+<div class="code-b">Shader <span class="st">"Custom/RainOnGlass"</span> {
+    Properties {
+        _MainTex    (<span class="st">"Текстура"</span>,   2D)    = <span class="st">"white"</span> {}
+        _RainSpeed  (<span class="st">"Швидкість"</span>,  Float) = 1.0
+        _DropSize   (<span class="st">"Розмір краплі"</span>, Float) = 0.5
+        _Distortion (<span class="st">"Спотворення"</span>, Float) = 0.02
+    }
+    SubShader {
+        Tags { <span class="st">"RenderType"</span>=<span class="st">"Transparent"</span> }
+        Pass {
+            HLSLPROGRAM
+            <span class="kw">#pragma</span> vertex vert
+            <span class="kw">#pragma</span> fragment frag
+            ENDHLSL
+        }
+    }
+}</div>
+<h2>Математика крапель</h2>
+<div class="code-b"><span class="cm">// Генерація позиції краплі в клітинці UV</span>
+<span class="kw">float2</span> RainDrop(<span class="kw">float2</span> uv, <span class="kw">float</span> t) {
+    uv.y += t * _RainSpeed;
+    <span class="kw">float2</span> cell = floor(uv);
+    <span class="kw">float2</span> pos  = frac(uv);
+    <span class="kw">float2</span> drop = hash(cell) * 0.6 + 0.2;
+    <span class="kw">float</span>  dist = length(pos - drop);
+    <span class="kw">return</span> smoothstep(_DropSize, 0.0, dist);
+}</div>
+<div class="tip-b"><p>Обчислюй шум у vertex shader і передавай як varying змінну — це знижує навантаження на GPU.</p></div>
+<h2>Заломлення світла крізь краплю</h2>
+<div class="code-b"><span class="kw">float2</span> offset = <span class="kw">float2</span>(ddy(drop), ddx(drop)) * _Distortion;
+<span class="kw">float4</span> bg = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offset);
+<span class="kw">return</span> bg;</div>
+<h2>Результат</h2>
+<p>Готовий шейдер дає красивий ефект дощу з мінімальними витратами. Можна розширити: сліди крапель, заморозка скла, бруд — всі ці ефекти будуються на тих самих принципах.</p>`},
+
+  godot:{
+    tag:'Godot 4 · Огляд',
+    title:'Godot 4 у 2025: чи варто переходити з Unity після скандалу з Runtime Fee?',
+    meta:['28 травня 2025','10 хв читання','3 100 переглядів','Автор: Владислав Демчук'],
+    body:`<h2>Що трапилось у вересні 2023?</h2>
+<p>Unity оголосила Runtime Fee — плату за кожну установку гри. Спільнота відреагувала різко: сотні студій оголосили про перехід на альтернативи, а Godot отримав рекордні пожертвування. Unity відкликала анонс, але довіра була підірвана.</p>
+<h2>Що нового у Godot 4</h2>
+<ul>
+  <li><strong>Vulkan рендерер</strong> — значно потужніший за попередній OpenGL</li>
+  <li><strong>GDScript 2.0</strong> — типізація, лямбди, краща продуктивність</li>
+  <li><strong>C# через .NET 6</strong> — повноцінна підтримка для тих, хто знає C#</li>
+  <li><strong>Покращений 3D</strong> — PBR матеріали та глобальне освітлення</li>
+</ul>
+<h2>GDScript — мова, схожа на Python</h2>
+<div class="code-b"><span class="cm"># Godot 4 GDScript — читабельний і лаконічний</span>
+<span class="kw">extends</span> CharacterBody2D
+
+<span class="kw">const</span> SPEED = 200.0
+<span class="kw">const</span> JUMP  = -400.0
+
+<span class="kw">func</span> _physics_process(delta):
+    <span class="kw">if not</span> is_on_floor():
+        velocity.y += get_gravity().y * delta
+    <span class="kw">if</span> Input.is_action_just_pressed(<span class="st">"jump"</span>) and is_on_floor():
+        velocity.y = JUMP
+    <span class="kw">var</span> dir = Input.get_axis(<span class="st">"left"</span>, <span class="st">"right"</span>)
+    velocity.x = dir * SPEED if dir else move_toward(velocity.x, 0, SPEED)
+    move_and_slide()</div>
+<div class="tip-b"><p>Якщо ти робиш 2D-гру і цінуєш відкритий код — Godot 4 є серйозним вибором у 2025. Для складних 3D-проєктів Unity досі має переваги.</p></div>`},
+
+  t1:{
+    tag:'Туторіал · Початківці',
+    title:'Unity з нуля: перша 2D-платформерна гра за 7 днів',
+    meta:['Туторіал','4.5 годин','Unity 6','Початківець'],
+    body:`<h2>Що ми створимо</h2>
+<p>За цей курс ми зробимо повноцінну 2D-платформерну гру: персонаж з анімацією, платформи, ворог, збирання монет, підрахунок очок та екран завершення. Наприкінці опублікуємо на itch.io.</p>
+<h2>День 1: Встановлення</h2>
+<p>Завантажуємо Unity Hub з unity.com/download. Встановлюємо Unity 6 LTS. При створенні обираємо шаблон «2D (URP)». Вивчаємо інтерфейс: Scene View, Hierarchy, Inspector, Project Window.</p>
+<h2>День 2: Персонаж та рух</h2>
+<div class="code-b"><span class="kw">public class</span> PlayerController : MonoBehaviour {
+    [SerializeField] <span class="kw">float</span> speed = 8f;
+    [SerializeField] <span class="kw">float</span> jump  = 12f;
+    Rigidbody2D rb;
+    <span class="kw">bool</span> grounded;
+
+    <span class="kw">void</span> Start()  { rb = GetComponent&lt;Rigidbody2D&gt;(); }
+
+    <span class="kw">void</span> Update() {
+        <span class="kw">float</span> h = Input.GetAxisRaw(<span class="st">"Horizontal"</span>);
+        rb.velocity = <span class="kw">new</span> Vector2(h * speed, rb.velocity.y);
+        <span class="kw">if</span> (Input.GetKeyDown(KeyCode.Space) && grounded) {
+            rb.AddForce(Vector2.up * jump, ForceMode2D.Impulse);
+            grounded = <span class="kw">false</span>;
+        }
+    }
+    <span class="kw">void</span> OnCollisionEnter2D(Collision2D c) {
+        <span class="kw">if</span> (c.gameObject.CompareTag(<span class="st">"Ground"</span>)) grounded = <span class="kw">true</span>;
+    }
+}</div>
+<h2>Дні 3–4: Анімація</h2>
+<p>Імпортуємо спрайт-аркуш і нарізаємо на кадри через Sprite Editor. Створюємо Animation Clips: Idle, Run, Jump. Налаштовуємо Animator Controller з переходами між станами.</p>
+<h2>День 5: Монети та UI</h2>
+<p>Prefab монети з Collider2D (Is Trigger = true). GameManager зберігає рахунок через Singleton. Canvas з TextMeshPro відображає очки.</p>
+<h2>Дні 6–7: Ворог і публікація</h2>
+<p>Простий ворог патрулює між двома точками. При ударі зверху — вмирає, при контакті з боку — гравець втрачає життя. Потім: File → Build Settings → WebGL → itch.io. Перший публічний проєкт готовий!</p>`}
+};
+
+function openArt(id){
+  const a=arts[id];
+  if(!a)return;
+  document.getElementById('artContent').innerHTML=`
+    <div class="af-tag">${a.tag}</div>
+    <h1 class="af-title">${a.title}</h1>
+    <div class="af-meta">${a.meta.map(m=>`<span>${m}</span>`).join('')}</div>
+    <div class="abody">${a.body}</div>
+  `;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('overlay').scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function closeArt(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeArt();});
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.eng-fill').forEach(b=>{
+        const w=b.style.width;b.style.width='0';
+        setTimeout(()=>{b.style.width=w;},80);
+      });
+    }
+  });
+},{threshold:0.3});
+document.querySelectorAll('.eng-card').forEach(c=>obs.observe(c));
+</script>
+</body>
+</html>
