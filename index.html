@@ -5,647 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIXEL FORGE — Блог про розробку ігор</title>
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=VT323&display=swap" rel="stylesheet">
-<style>
-/* ============================================================
-   CSS-ЗМІННІ — вся кольорова палітра сайту в одному місці.
-   Змінюючи лише ці значення, можна перефарбувати весь сайт.
-   ============================================================ */
-:root {
-  --paper:  #0f0f0f; /* основний фон — бежевий "старий папір" */
-  --paper2: #161616; /* трохи темніший папір для чергування секцій */
-  --paper3: #111111; /* найсвітліший варіант паперу */
-  --ink:    #e8dcc8; /* чорнило — майже чорний, теплий відтінок */
-  --ink2:   #c8b99a; /* текст середньої насиченості */
-  --ink3:   #7a6e5e; /* приглушений текст, підписи, мета-інфо */
-  --red:    #8b1a1a; /* темно-червоний — головний акцент */
-  --red2:   #b52b2b; /* яскравіший червоний для станів hover */
-  --rust:   #7a4a2a; /* іржавий коричневий — середній рівень */
-  --border: #2e2e2e; /* колір рамок, ліній, розділювачів */
-}
-
-/* ============================================================
-   СКИДАННЯ СТИЛІВ та базові налаштування
-   ============================================================ */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; } /* плавна прокрутка при переходах */
-
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: 'Crimson Text', Georgia, serif;
-  font-size: 18px;
-  line-height: 1.7;
-  overflow-x: hidden; /* забороняємо горизонтальний скрол */
-  position: relative;
-}
-
-/* ============================================================
-   GRAIN-ЕФЕКТ — зернистість "старого паперу".
-   Псевдоелемент ::before через SVG-фільтр turbulence.
-   pointer-events:none — не блокує кліки користувача.
-   z-index:9999 — поверх усього вмісту.
-   ============================================================ */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: .025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-}
-
-/* ============================================================
-   ПЛЯМИ НА ПАПЕРІ — імітація потертостей і пожовтіння.
-   Два radial-gradient, тонка непрозорість.
-   ============================================================ */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  pointer-events: none; z-index: 0;
-  background:
-    radial-gradient(ellipse 55% 35% at 10% 15%, rgba(10,5,2,.5) 0%, transparent 70%),
-    radial-gradient(ellipse 35% 55% at 90% 80%, rgba(20,5,5,.4) 0%, transparent 70%);
-}
-
-/* ============================================================
-   НАВІГАЦІЙНА ПАНЕЛЬ — фіксована, завжди зверху
-   ============================================================ */
-nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 1000;
-  background: #080808;
-  border-bottom: 3px double #2a2a2a; /* подвійна лінія — ретро-стиль */
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 52px; height: 62px;
-}
-.nav-logo { font-family: 'Special Elite', monospace; font-size: 21px; color: #e8dcc8; letter-spacing: 4px; cursor: pointer; }
-.nav-logo em { color: var(--red2); font-style: normal; }
-.nav-links { list-style: none; display: flex; gap: 32px; }
-.nav-links a { font-family: 'Special Elite', monospace; font-size: 12px; color: #4a4030; text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color .2s; }
-.nav-links a:hover { color: #e8dcc8; }
-.nav-sub { font-family: 'Special Elite', monospace; font-size: 11px; color: #e8dcc8; background: #1a1a1a; border: 1px solid #2e2e2e; padding: 7px 18px; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; transition: all .2s; }
-.nav-sub:hover { background: var(--red); color: var(--paper); border-color: var(--red); }
-
-/* ============================================================
-   СМУЖКА ПРОГРЕСУ ПРОКРУТКИ — тонка червона лінія під навбаром.
-   Ширина в % керується через JavaScript.
-   ============================================================ */
-.scroll-line { position: fixed; top: 62px; left: 0; height: 2px; background: var(--red); z-index: 1001; width: 0%; transition: width .1s; }
-
-/* ============================================================
-   HERO — головний екран
-   ============================================================ */
-#home { min-height: 100vh; padding-top: 62px; display: flex; align-items: center; border-bottom: 2px solid var(--border); position: relative; z-index: 1; }
-
-/* Двоколоночна сітка: текст + декоративний блок */
-.hero-wrap { max-width: 1120px; margin: 0 auto; padding: 80px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-.hero-eyebrow { font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--ink3); margin-bottom: 22px; display: flex; align-items: center; gap: 12px; }
-.hero-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--red); display: block; }
-.hero-title { font-family: 'Special Elite', monospace; font-size: clamp(46px, 6.5vw, 82px); line-height: 1; color: var(--ink); margin-bottom: 10px; }
-.hero-title .r { color: var(--red); display: block; }
-.hero-subtitle { font-family: 'Crimson Text', serif; font-size: 20px; font-style: italic; color: var(--ink3); margin-bottom: 28px; line-height: 1.5; }
-.hero-desc { font-size: 17px; color: var(--ink2); line-height: 1.9; margin-bottom: 44px; max-width: 460px; }
-.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
-
-/* Кнопки — темна і прозора */
-.btn-dark { font-family: 'Special Elite', monospace; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; padding: 13px 34px; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); cursor: pointer; transition: all .2s; }
-.btn-dark:hover { background: var(--red); border-color: var(--red); }
-.btn-ghost { font-family: 'Special Elite', monospace; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; padding: 13px 34px; background: transparent; color: var(--ink); border: 2px solid var(--ink); cursor: pointer; transition: all .2s; }
-.btn-ghost:hover { background: var(--ink); color: var(--paper); }
-
-/* Лічильники статистики під кнопками */
-.hero-stats { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 46px; padding-top: 30px; border-top: 1px solid var(--border); }
-.stat-num { font-family: 'Special Elite', monospace; font-size: 38px; color: var(--red); line-height: 1; }
-.stat-label { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); margin-top: 3px; }
-
-/* Декоративний блок з описом у правій колонці */
-.hero-box { border: 2px solid #2a2a2a; background: #131313; padding: 38px; box-shadow: 6px 6px 0 #2a2a2a; position: relative; }
-.hero-box::before { content: ''; position: absolute; inset: 7px; border: 1px solid #222222; pointer-events: none; } /* внутрішня декоративна рамка */
-.hbox-label { font-family: 'VT323', monospace; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); border-bottom: 1px solid var(--border); padding-bottom: 11px; margin-bottom: 18px; }
-.hero-box p { font-size: 15px; color: var(--ink2); line-height: 1.95; margin-bottom: 13px; }
-.hero-box p:last-child { margin-bottom: 0; }
-
-/* Мигаючий курсор — CSS-анімація */
-.caret { display: inline-block; width: 9px; height: 17px; background: #e8dcc8; vertical-align: middle; animation: blink 1s step-end infinite; margin-left: 2px; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-/* ============================================================
-   СПІЛЬНІ СТИЛІ СЕКЦІЙ
-   ============================================================ */
-section { position: relative; z-index: 1; }
-.sw { max-width: 1120px; margin: 0 auto; padding: 96px 60px; } /* обгортка контенту */
-
-/* Заголовок секції з великим декоративним номером */
-.sh { display: flex; align-items: baseline; gap: 18px; margin-bottom: 60px; }
-.sh-num { font-family: 'VT323', monospace; font-size: 84px; color: var(--paper2); line-height: 1; flex-shrink: 0; } /* майже непомітний великий номер */
-.sh-eye { font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--red); margin-bottom: 5px; }
-.sh-title { font-family: 'Special Elite', monospace; font-size: clamp(24px, 3.5vw, 42px); color: var(--ink); line-height: 1.1; }
-.sh-title em { color: var(--red); font-style: normal; }
-.sh-sub { font-size: 16px; color: var(--ink3); line-height: 1.7; max-width: 540px; margin-top: 10px; }
-
-/* ============================================================
-   СТАТТІ
-   ============================================================ */
-#articles { background: var(--paper2); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); }
-.art-featured { display: grid; grid-template-columns: 1.45fr 1fr; gap: 48px; margin-bottom: 44px; padding-bottom: 44px; border-bottom: 1px solid var(--border); }
-.art-card { cursor: pointer; transition: transform .2s; }
-.art-card:hover { transform: translateY(-3px); }
-.art-thumb { width: 100%; height: 210px; display: flex; align-items: center; justify-content: center; font-size: 60px; margin-bottom: 22px; position: relative; overflow: hidden; border: 2px solid var(--ink); }
-
-/* Різні темні градієнти для різних тематик статей */
-.at-unity  { background: linear-gradient(145deg, #1c1c16, #242010); }
-.at-unreal { background: linear-gradient(145deg, #1c1010, #2a1212); }
-.at-godot  { background: linear-gradient(145deg, #101c10, #101e10); }
-.at-shader { background: linear-gradient(145deg, #100c1c, #180c28); }
-.at-audio  { background: linear-gradient(145deg, #1c1a10, #28220c); }
-.at-optim  { background: linear-gradient(145deg, #0c1a1c, #0c2222); }
-
-/* Плашка категорії — абсолютно позиційована знизу зображення */
-.at-tag { position: absolute; bottom: 0; left: 0; right: 0; background: var(--red); color: #e8dcc8; font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; padding: 5px 12px; }
-.art-meta { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 2px; color: var(--ink3); text-transform: uppercase; margin-bottom: 9px; display: flex; gap: 14px; flex-wrap: wrap; }
-.art-title { font-family: 'Special Elite', monospace; font-size: 20px; color: var(--ink); line-height: 1.3; margin-bottom: 11px; }
-.art-card.big .art-title { font-size: 26px; } /* головна стаття — більший шрифт */
-.art-excerpt { font-size: 15px; color: var(--ink2); line-height: 1.85; margin-bottom: 14px; }
-
-/* Посилання "читати" зі стрілкою, що рухається при ховері */
-.art-more { font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: gap .2s; }
-.art-more:hover { gap: 14px; }
-.art-more::after { content: '→'; }
-.art-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-
-/* ============================================================
-   ВІДЕО — секція з YouTube embed
-   ============================================================ */
-#videos { background: var(--paper3); }
-.video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-
-.vid-card { border: 2px solid #2a2a2a; background: #141414; box-shadow: 4px 4px 0 #2a2a2a; overflow: hidden; transition: transform .2s, box-shadow .2s; }
-.vid-card:hover { transform: translate(-3px, -3px); box-shadow: 7px 7px 0 #3a3a3a; }
-
-/* Обгортка iframe для збереження пропорцій 16:9.
-   Трюк: padding-bottom = 9/16 * 100% = 56.25% */
-.vid-embed { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-.vid-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-.vid-body { padding: 20px 22px 22px; }
-.vid-channel { font-family: 'Special Elite', monospace; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
-.vid-title { font-family: 'Special Elite', monospace; font-size: 15px; color: var(--ink); line-height: 1.35; margin-bottom: 8px; }
-.vid-desc { font-size: 13px; color: var(--ink3); line-height: 1.7; }
-
-/* ============================================================
-   ДВИЖКИ
-   ============================================================ */
-#engines { background: var(--paper); }
-.eng-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
-.eng-card { border: 2px solid #2a2a2a; background: #141414; padding: 34px 26px; box-shadow: 4px 4px 0 #2a2a2a; position: relative; transition: transform .2s, box-shadow .2s; }
-.eng-card:hover { transform: translate(-3px, -3px); box-shadow: 7px 7px 0 #3a3a3a; }
-
-/* Значок "рекомендовано" у куті картки */
-.eng-card.rec::before { content: 'РЕКОМЕНДОВАНО'; position: absolute; top: -1px; right: -1px; background: var(--red); color: var(--paper); font-family: 'Special Elite', monospace; font-size: 9px; letter-spacing: 2px; padding: 4px 10px; text-transform: uppercase; }
-.eng-icon { font-size: 40px; margin-bottom: 14px; display: block; }
-.eng-name { font-family: 'Special Elite', monospace; font-size: 26px; color: var(--ink); margin-bottom: 4px; }
-.eng-ver  { font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 2px; color: var(--ink3); text-transform: uppercase; margin-bottom: 18px; }
-.eng-desc { font-size: 15px; color: var(--ink2); line-height: 1.85; margin-bottom: 22px; }
-.eng-list { list-style: none; border-top: 1px solid var(--border); padding-top: 14px; margin-bottom: 24px; }
-.eng-list li { font-size: 13px; color: var(--ink2); padding: 5px 0; border-bottom: 1px dashed var(--border); display: flex; gap: 8px; align-items: flex-start; }
-.eng-list li::before { content: '—'; color: var(--red); flex-shrink: 0; }
-
-/* Шкала прогресу: label + bar */
-.eng-bar-wrap { margin-bottom: 9px; }
-.eng-bar-row { display: flex; justify-content: space-between; font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 1px; color: var(--ink3); margin-bottom: 4px; text-transform: uppercase; }
-.eng-bar { height: 3px; background: var(--border); }
-/* CSS-анімація заповнення шкали — запускається через IntersectionObserver */
-.eng-fill { height: 3px; background: #e8dcc8; animation: growBar 1.4s ease-out forwards; }
-@keyframes growBar { from { width: 0; } }
-
-/* ============================================================
-   ТУТОРІАЛИ
-   ============================================================ */
-#tutorials { background: var(--paper2); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); }
-.tut-layout { display: grid; grid-template-columns: 1fr 340px; gap: 56px; align-items: start; }
-.tut-list { display: flex; flex-direction: column; }
-
-/* Кожен туторіал — рядок з номером і вмістом */
-.tut-item { display: grid; grid-template-columns: 52px 1fr; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: padding-left .2s; align-items: start; }
-.tut-item:first-child { border-top: 1px solid var(--border); }
-.tut-item:hover { padding-left: 8px; } /* зсув вправо при ховері */
-.tut-num { font-family: 'VT323', monospace; font-size: 40px; color: var(--border); line-height: 1; }
-.tut-level { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
-.lv-easy { color: #4a7a3a; } .lv-mid { color: var(--rust); } .lv-hard { color: var(--red); }
-.tut-title { font-family: 'Special Elite', monospace; font-size: 17px; color: var(--ink); line-height: 1.3; margin-bottom: 5px; }
-.tut-desc  { font-size: 14px; color: var(--ink3); line-height: 1.7; margin-bottom: 8px; }
-.tut-meta  { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 1px; color: var(--ink3); text-transform: uppercase; display: flex; gap: 14px; flex-wrap: wrap; }
-
-/* Бічна панель */
-.sidebar { display: flex; flex-direction: column; gap: 26px; }
-.widget { border: 2px solid var(--ink); background: var(--paper3); }
-.widget-head { background: #080808; color: #e8dcc8; font-family: 'Special Elite', monospace; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; padding: 11px 18px; }
-.widget-body { padding: 18px; }
-.tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 1px; padding: 4px 11px; border: 1px solid var(--ink); color: var(--ink2); cursor: pointer; text-transform: uppercase; transition: all .15s; }
-.tag:hover { background: var(--ink); color: var(--paper); }
-.res-item { display: flex; gap: 11px; padding: 9px 0; border-bottom: 1px dashed var(--border); cursor: pointer; align-items: flex-start; }
-.res-item:last-child { border-bottom: none; }
-.res-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
-.res-name { font-size: 13px; color: var(--ink2); line-height: 1.4; }
-.res-type { font-family: 'Special Elite', monospace; font-size: 9px; letter-spacing: 1px; color: var(--ink3); text-transform: uppercase; margin-top: 2px; }
-.res-item:hover .res-name { color: var(--red); }
-
-/* ============================================================
-   ROADMAP — вертикальний список кроків з пунктирною лінією
-   ============================================================ */
-#roadmap { background: var(--paper3); }
-.rm-wrap { max-width: 760px; position: relative; }
-/* Пунктирна вертикальна лінія вздовж кроків */
-.rm-wrap::before { content: ''; position: absolute; left: 23px; top: 0; bottom: 0; width: 1px; background: repeating-linear-gradient(to bottom, var(--border) 0, var(--border) 6px, transparent 6px, transparent 12px); }
-.rm-item { display: grid; grid-template-columns: 48px 1fr; gap: 26px; margin-bottom: 50px; align-items: start; }
-/* Квадрат з номером — поверх пунктирної лінії через z-index */
-.rm-node { width: 48px; height: 48px; border: 2px solid #2a2a2a; background: #111111; flex-shrink: 0; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; font-family: 'Special Elite', monospace; font-size: 17px; color: var(--red); }
-.rm-phase { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 5px; }
-.rm-title { font-family: 'Special Elite', monospace; font-size: 21px; color: var(--ink); margin-bottom: 9px; }
-.rm-desc  { font-size: 15px; color: var(--ink2); line-height: 1.9; margin-bottom: 14px; }
-.rm-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.rm-chip  { font-family: 'Special Elite', monospace; font-size: 9px; letter-spacing: 1px; padding: 4px 10px; border: 1px solid var(--ink); color: var(--ink2); text-transform: uppercase; }
-
-/* ============================================================
-   DEVLOG — картки щоденника
-   ============================================================ */
-#devlog { background: var(--paper2); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); }
-.dlog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-.dlog-card { border: 2px solid #2a2a2a; background: #141414; padding: 30px; box-shadow: 3px 3px 0 #2a2a2a; transition: transform .2s, box-shadow .2s; cursor: pointer; }
-.dlog-card:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
-.dlog-date { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink3); margin-bottom: 12px; display: flex; align-items: center; gap: 9px; }
-.dlog-date::before { content: '//'; color: var(--red); } /* псевдо-коментар у стилі коду */
-.dlog-title { font-family: 'Special Elite', monospace; font-size: 19px; color: var(--ink); line-height: 1.3; margin-bottom: 12px; }
-.dlog-text  { font-size: 15px; color: var(--ink2); line-height: 1.85; margin-bottom: 18px; }
-.dlog-foot  { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
-.dlog-status { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 3px 9px; border: 1px solid; }
-.st-prog { color: var(--rust); border-color: var(--rust); }
-.st-done { color: #5a9a4a; border-color: #5a9a4a; }
-.st-plan { color: var(--ink3); border-color: var(--ink3); }
-.dlog-likes { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--ink3); letter-spacing: 1px; }
-
-/* ============================================================
-   NEWSLETTER — темна секція для підписки
-   ============================================================ */
-#newsletter { background: #080808; color: #e8dcc8; text-align: center; border-top: 1px solid #2a2a2a; }
-#newsletter .sw { padding: 88px 60px; }
-.news-desc { font-size: 17px; color: #5a5040; line-height: 1.8; max-width: 500px; margin: 0 auto 36px; }
-.news-form { display: flex; max-width: 500px; margin: 0 auto; }
-.news-input { flex: 1; background: rgba(232,220,200,.04); border: 2px solid #2a2a2a; border-right: none; padding: 15px 20px; color: var(--paper); font-family: 'Crimson Text', serif; font-size: 17px; outline: none; transition: border-color .2s; }
-.news-input::placeholder { color: #2e2820; }
-.news-input:focus { border-color: #9a8e7e; }
-.news-btn { font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 15px 26px; background: var(--red); color: var(--paper); border: 2px solid var(--red); cursor: pointer; flex-shrink: 0; transition: background .2s; }
-.news-btn:hover { background: var(--red2); border-color: var(--red2); }
-.news-note { margin-top: 13px; font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 1px; color: #2e2820; text-transform: uppercase; }
-
-/* ============================================================
-   АВТОР
-   ============================================================ */
-#author { background: var(--paper); }
-.author-grid { display: grid; grid-template-columns: 280px 1fr; gap: 70px; align-items: start; }
-
-/* Рамка аватару зі зміщеною тінню */
-.author-frame { width: 260px; height: 260px; border: 3px solid #2a2a2a; box-shadow: 6px 6px 0 #2a2a2a; background: var(--paper2); display: flex; align-items: center; justify-content: center; font-size: 88px; position: relative; margin-bottom: 22px; }
-.author-frame::after { content: 'ФОТО АВТОРА'; position: absolute; bottom: 0; left: 0; right: 0; background: #080808; color: #e8dcc8; font-family: 'Special Elite', monospace; font-size: 9px; letter-spacing: 3px; text-align: center; padding: 5px; text-transform: uppercase; }
-
-/* Декоративна карта з координатами */
-.author-map { border: 2px solid var(--ink); background: var(--paper2); height: 155px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.map-lines { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 18px 18px; opacity: .5; }
-.map-cnt { position: relative; text-align: center; z-index: 1; }
-.map-pin-e { font-size: 26px; display: block; }
-.map-city  { font-family: 'Special Elite', monospace; font-size: 13px; color: var(--ink); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
-.map-coord { font-family: 'Special Elite', monospace; font-size: 9px; color: var(--ink3); letter-spacing: 1px; margin-top: 2px; }
-
-.a-eye  { font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--red); margin-bottom: 9px; }
-.a-name { font-family: 'Special Elite', monospace; font-size: 46px; color: var(--ink); line-height: 1.05; margin-bottom: 5px; }
-.a-nick { font-family: 'VT323', monospace; font-size: 22px; color: var(--ink3); letter-spacing: 2px; margin-bottom: 22px; }
-.a-bio  { font-size: 16px; color: var(--ink2); line-height: 1.9; margin-bottom: 28px; max-width: 520px; }
-
-/* Таблиця контактів із пунктирними розділювачами */
-.ctable { border-collapse: collapse; margin-bottom: 26px; width: 100%; }
-.ctable td { padding: 8px 14px 8px 0; font-size: 15px; vertical-align: top; border-bottom: 1px dashed var(--border); }
-.ctable td:first-child { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); white-space: nowrap; width: 110px; padding-right: 22px; }
-.ctable td:last-child { color: var(--ink2); }
-.a-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.a-chip   { font-family: 'Special Elite', monospace; font-size: 9px; letter-spacing: 1px; padding: 4px 10px; border: 1px solid var(--ink); color: var(--ink2); text-transform: uppercase; }
-
-/* ============================================================
-   ПІДВАЛ
-   ============================================================ */
-footer { background: #080808; color: #5a5040; border-top: 3px double #1e1e1e; }
-.footer-inner { max-width: 1120px; margin: 0 auto; padding: 56px 60px 28px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
-.f-logo { font-family: 'Special Elite', monospace; font-size: 24px; color: #e8dcc8; letter-spacing: 4px; margin-bottom: 12px; }
-.f-logo em { color: var(--red2); font-style: normal; }
-.f-tag   { font-size: 14px; color: #5a5048; line-height: 1.7; max-width: 270px; }
-.f-col-h { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #e8dcc8; border-bottom: 1px solid #1e1e1e; padding-bottom: 9px; margin-bottom: 16px; }
-.f-links { list-style: none; display: flex; flex-direction: column; gap: 9px; }
-.f-links a { font-size: 14px; color: #3a3028; text-decoration: none; transition: color .2s; }
-.f-links a:hover { color: var(--red2); }
-.f-bottom { max-width: 1120px; margin: 0 auto; padding: 20px 60px; border-top: 1px solid #181818; display: flex; justify-content: space-between; align-items: center; }
-.f-copy { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #252018; }
-.f-soc { display: flex; gap: 22px; }
-.f-soc a { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #3a3028; text-decoration: none; transition: color .2s; }
-.f-soc a:hover { color: var(--red2); }
-
-/* ============================================================
-   ОВЕРЛЕЙ — повна стаття поверх сторінки
-   ============================================================ */
-.overlay { display: none; position: fixed; inset: 0; z-index: 3000; background: var(--paper3); overflow-y: auto; }
-.overlay.open { display: block; } /* JS додає цей клас для відкриття */
-.ov-close { position: fixed; top: 18px; right: 38px; font-family: 'Special Elite', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; background: #080808; color: #e8dcc8; border: none; padding: 10px 20px; cursor: pointer; z-index: 3100; transition: background .2s; }
-.ov-close:hover { background: var(--red); }
-.art-full { max-width: 740px; margin: 0 auto; padding: 78px 40px 110px; }
-.af-tag   { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
-.af-title { font-family: 'Special Elite', monospace; font-size: 34px; color: var(--ink); line-height: 1.2; margin-bottom: 14px; }
-.af-meta  { font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: 1px; color: var(--ink3); text-transform: uppercase; display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 36px; padding-bottom: 24px; border-bottom: 2px solid var(--border); }
-.abody h2 { font-family: 'Special Elite', monospace; font-size: 22px; color: var(--red); margin: 40px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 7px; }
-.abody h3 { font-family: 'Special Elite', monospace; font-size: 17px; color: var(--ink); margin: 26px 0 8px; }
-.abody p  { font-size: 17px; line-height: 1.9; color: var(--ink2); margin-bottom: 16px; }
-.abody ul { margin: 14px 0 22px; padding-left: 22px; }
-.abody ul li { font-size: 16px; line-height: 1.8; color: var(--ink2); margin-bottom: 6px; }
-.abody ul li::marker { color: var(--red); }
-
-/* Блок коду з підсвіткою синтаксису */
-.code-b { background: var(--paper2); border: 1px solid var(--border); border-left: 3px solid var(--ink); padding: 22px 26px; font-family: 'VT323', monospace; font-size: 17px; color: var(--ink2); margin: 24px 0; overflow-x: auto; line-height: 1.6; white-space: pre; }
-.cm { color: var(--ink3); } /* коментарі */
-.kw { color: var(--red);   } /* ключові слова */
-.st { color: var(--rust);  } /* рядкові літерали */
-
-/* Блок "порада" */
-.tip-b { border: 1px solid var(--border); background: var(--paper2); padding: 22px 26px; margin: 24px 0; }
-.tip-b::before { content: '\2014 \041F\041E\0420\0410\0414\0410 \2014'; font-family: 'Special Elite', monospace; font-size: 9px; color: var(--red); letter-spacing: 3px; display: block; margin-bottom: 9px; }
-.tip-b p { font-size: 15px; color: var(--ink2); margin: 0; }
-
-/* ============================================================
-   "РВАНИЙ" СТИЛЬ — torn / distressed ефекти
-   ============================================================ */
-
-/* --- Подряпини поверх усієї сторінки --- */
-body > .scratch-layer {
-  position: fixed; inset: 0; pointer-events: none; z-index: 9998;
-  background-image:
-    /* довгі діагональні подряпини */
-    repeating-linear-gradient(
-      127deg,
-      transparent 0px, transparent 180px,
-      rgba(232,220,200,.018) 180px, rgba(232,220,200,.018) 181px,
-      transparent 181px, transparent 340px
-    ),
-    repeating-linear-gradient(
-      53deg,
-      transparent 0px, transparent 260px,
-      rgba(232,220,200,.012) 260px, rgba(232,220,200,.012) 261px,
-      transparent 261px, transparent 500px
-    );
-}
-
-/* --- Нерівний рваний верхній край секції (SVG polygon) --- */
-.torn-top {
-  position: relative;
-  margin-top: -2px;
-}
-.torn-top::before {
-  content: '';
-  display: block;
-  height: 28px;
-  background: inherit;
-  clip-path: polygon(
-    0% 100%, 1.2% 20%, 2.8% 85%, 4% 10%, 5.5% 70%,
-    7% 5%,  8.3% 60%, 10% 90%, 11.5% 15%, 13% 75%,
-    14.5% 30%, 16% 95%, 17.5% 40%, 19% 80%, 20.5% 5%,
-    22% 65%, 23.5% 88%, 25% 25%, 26.5% 72%, 28% 12%,
-    30% 55%, 32% 100%, 34% 20%, 36% 80%, 38% 40%,
-    40% 90%, 42% 15%, 44% 60%, 46% 8%,  48% 70%,
-    50% 35%, 52% 85%, 54% 18%, 56% 65%, 58% 92%,
-    60% 28%, 62% 75%, 64% 10%, 66% 50%, 68% 88%,
-    70% 22%, 72% 68%, 74% 5%,  76% 45%, 78% 82%,
-    80% 30%, 82% 70%, 84% 12%, 86% 55%, 88% 90%,
-    90% 25%, 92% 60%, 94% 8%,  96% 48%, 98% 78%,
-    100% 15%, 100% 100%
-  );
-}
-
-/* --- Нерівний рваний нижній край секції --- */
-.torn-bottom::after {
-  content: '';
-  display: block;
-  height: 28px;
-  background: inherit;
-  clip-path: polygon(
-    0% 0%, 100% 0%,
-    100% 60%, 98% 95%, 96% 30%, 94% 80%, 92% 15%,
-    90% 70%, 88% 5%,  86% 50%, 84% 90%, 82% 25%,
-    80% 65%, 78% 10%, 76% 55%, 74% 88%, 72% 20%,
-    70% 75%, 68% 40%, 66% 85%, 64% 12%, 62% 58%,
-    60% 92%, 58% 35%, 56% 70%, 54% 8%,  52% 48%,
-    50% 80%, 48% 22%, 46% 62%, 44% 95%, 42% 38%,
-    40% 72%, 38% 18%, 36% 60%, 34% 88%, 32% 28%,
-    30% 65%, 28% 5%,  26% 45%, 24% 82%, 22% 20%,
-    20% 58%, 18% 92%, 16% 35%, 14% 70%, 12% 15%,
-    10% 55%, 8% 88%, 6% 28%, 4% 68%, 2% 10%, 0% 50%
-  );
-}
-
-/* --- Перекошені рамки карток --- */
-.art-card, .eng-card, .dlog-card, .vid-card, .tut-item {
-  position: relative;
-}
-
-/* Подряпина на картках — псевдоелемент ::after */
-.art-card::after, .eng-card::after, .dlog-card::after {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-  inset: 0;
-  background-image:
-    linear-gradient(
-      113deg,
-      transparent 30%, rgba(232,220,200,.025) 30%,
-      rgba(232,220,200,.025) 30.3%, transparent 30.3%
-    ),
-    linear-gradient(
-      71deg,
-      transparent 55%, rgba(232,220,200,.015) 55%,
-      rgba(232,220,200,.015) 55.2%, transparent 55.2%
-    );
-  z-index: 2;
-}
-
-/* --- Злегка скошена рамка для art-thumb --- */
-.art-thumb {
-  border: 2px solid var(--ink) !important;
-  clip-path: polygon(
-    0 3px, 3px 0, calc(100% - 2px) 1px, 100% 4px,
-    100% calc(100% - 3px), calc(100% - 3px) 100%,
-    2px calc(100% - 1px), 0 calc(100% - 4px)
-  );
-}
-
-/* --- Нерівні краї заголовка hero --- */
-.hero-title {
-  text-shadow: 2px 0 0 rgba(139,26,26,.4), -1px 0 0 rgba(139,26,26,.15);
-  position: relative;
-}
-
-/* --- Горизонтальні "надрізи" в розділювачах --- */
-.sh {
-  position: relative;
-}
-.sh::after {
-  content: '';
-  position: absolute;
-  bottom: -20px; left: 0; right: 0;
-  height: 1px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--border) 0px, var(--border) 18px,
-    transparent 18px, transparent 24px,
-    var(--border) 24px, var(--border) 38px,
-    transparent 38px, transparent 50px
-  );
-  opacity: .5;
-}
-
-/* --- Скошені кути кнопок (clip-path) --- */
-.btn-dark, .btn-ghost, .nav-sub {
-  clip-path: polygon(
-    0 0, calc(100% - 8px) 0, 100% 8px,
-    100% 100%, 8px 100%, 0 calc(100% - 8px)
-  );
-  border: none !important;
-  outline: 2px solid var(--ink);
-  outline-offset: -2px;
-}
-.btn-dark { background: var(--ink) !important; color: var(--paper) !important; }
-.btn-dark:hover { background: var(--red) !important; outline-color: var(--red) !important; }
-.btn-ghost { background: transparent !important; color: var(--ink) !important; }
-.btn-ghost:hover { background: var(--ink) !important; color: var(--paper) !important; }
-.nav-sub { background: #1a1a1a !important; color: #e8dcc8 !important; outline-color: #2e2e2e !important; }
-.nav-sub:hover { background: var(--red) !important; outline-color: var(--red) !important; }
-
-/* --- "Рваний" край у hero-box --- */
-.hero-box {
-  clip-path: polygon(
-    0 0, 100% 2px, calc(100% - 1px) calc(100% - 3px),
-    3px 100%, 1px 2px
-  );
-  outline: 1px solid #2a2a2a;
-  outline-offset: 8px;
-}
-
-/* --- Статус-бейджі з нерівними краями --- */
-.dlog-status, .rm-chip, .a-chip, .tag {
-  clip-path: polygon(
-    2px 0, 100% 1px, calc(100% - 1px) 100%, 0 calc(100% - 2px)
-  );
-}
-
-/* --- Нахилений заголовок секції номер --- */
-.sh-num {
-  transform: rotate(-2deg) translateY(4px);
-  display: inline-block;
-  opacity: .25;
-}
-
-/* --- Підкреслення заголовків — рвана лінія --- */
-.sh-title {
-  position: relative;
-  display: inline;
-}
-.sh-title::after {
-  content: '';
-  display: block;
-  height: 2px;
-  width: 100%;
-  margin-top: 6px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--red) 0, var(--red) 12px,
-    transparent 12px, transparent 16px,
-    var(--red) 16px, var(--red) 22px,
-    transparent 22px, transparent 30px
-  );
-  opacity: .6;
-}
-
-/* --- Нерівний лівий відступ у списку туторіалів --- */
-.tut-item:nth-child(odd)  { padding-left: 3px; }
-.tut-item:nth-child(even) { padding-left: 1px; }
-
-/* --- Легкий нахил великих цифр у туторіалах --- */
-.tut-num { transform: rotate(-3deg); display: inline-block; }
-.rm-node  { transform: rotate(1.5deg); }
-
-/* --- "Розбита" рамка секцій через box-shadow замість border --- */
-#articles, #tutorials, #devlog {
-  border-top: none !important;
-  border-bottom: none !important;
-  box-shadow:
-    0 -1px 0 rgba(232,220,200,.07),
-    inset 0 1px 0 rgba(232,220,200,.04);
-}
-
-/* --- Eng-card подряпини + легкий нахил при ховері --- */
-.eng-card:hover {
-  transform: translate(-3px,-3px) rotate(-0.4deg) !important;
-}
-.dlog-card:hover {
-  transform: translate(-2px,-2px) rotate(0.3deg) !important;
-}
-.art-card:hover {
-  transform: translateY(-3px) rotate(-0.2deg) !important;
-}
-
-/* --- "Тріщини" у підзаголовках через text-shadow --- */
-.hbox-label, .widget-head, .af-tag {
-  text-shadow: 1px 0 0 rgba(139,26,26,.5), 0 1px 0 rgba(0,0,0,.4);
-  letter-spacing: 5px;
-}
-
-/* --- Нерівна горизонтальна лінія roadmap --- */
-.rm-wrap::before {
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--red) 0, var(--red) 3px,
-    transparent 3px, transparent 8px,
-    rgba(139,26,26,.3) 8px, rgba(139,26,26,.3) 9px,
-    transparent 9px, transparent 14px
-  ) !important;
-  width: 2px !important;
-  left: 22px !important;
-}
-
-/* --- Scroll-line більш виражена --- */
-.scroll-line {
-  height: 3px !important;
-  background: linear-gradient(90deg, var(--red), #ff4444, var(--red)) !important;
-  box-shadow: 0 0 6px rgba(139,26,26,.6) !important;
-}
-
-/* ============================================================
-   АДАПТИВНА ВЕРСТКА
-   ============================================================ */
-@media (max-width: 1024px) {
-  nav { padding: 0 24px; }
-  .nav-links { display: none; } /* навігація прихована на малих екранах */
-  .hero-wrap, .author-grid { grid-template-columns: 1fr; }
-  .hero-wrap { padding: 60px 36px; gap: 40px; }
-  .hero-box { display: none; }
-  .sw { padding: 72px 36px; }
-  /* всі сітки перетворюємо на одну колонку */
-  .art-featured, .art-grid3, .eng-grid, .tut-layout,
-  .dlog-grid, .footer-inner, .video-grid { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
-}
-@media (max-width: 640px) {
-  .hero-title { font-size: 46px; }
-  .news-form { flex-direction: column; }
-  .news-input { border-right: 2px solid #3a3028; border-bottom: none; }
-  .f-bottom { flex-direction: column; gap: 12px; }
-}
-</style>
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
@@ -658,7 +18,6 @@ body > .scratch-layer {
      НАВІГАЦІЙНА ПАНЕЛЬ
      ====================================================== -->
 <nav>
-  <!-- onclick повертає на початок сторінки -->
   <div class="nav-logo" onclick="scrollTo(0,0)">PIXEL<em>FORGE</em></div>
   <ul class="nav-links">
     <li><a href="#home">Головна</a></li>
@@ -674,7 +33,7 @@ body > .scratch-layer {
 </nav>
 
 <!-- ======================================================
-     HERO — головний екран
+     HERO
      ====================================================== -->
 <section id="home">
   <div class="hero-wrap">
@@ -717,7 +76,6 @@ body > .scratch-layer {
       </div>
     </div>
     <div class="art-featured">
-      <!-- onclick відкриває повну статтю в оверлеї -->
       <div class="art-card big" onclick="openArt('physics')">
         <div class="art-thumb at-unity">🎮<div class="at-tag">Unity — Фізика</div></div>
         <div class="art-meta"><span>12 червня 2025</span><span>18 хв читання</span><span>4 200 переглядів</span></div>
@@ -769,7 +127,7 @@ body > .scratch-layer {
 </section>
 
 <!-- ======================================================
-     ВІДЕО — 6 реальних YouTube embed
+     ВІДЕО
      ====================================================== -->
 <section id="videos" class="torn-top torn-bottom">
   <div class="sw">
@@ -782,9 +140,6 @@ body > .scratch-layer {
       </div>
     </div>
     <div class="video-grid">
-
-      <!-- ВІДЕО 1: Code Monkey — повний курс Unity (10 годин) -->
-      <!-- AmGSEH7QcDg — ID відео на YouTube -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/AmGSEH7QcDg"
@@ -798,9 +153,6 @@ body > .scratch-layer {
           <div class="vid-desc">Безкоштовний курс від Code Monkey. Будуємо повноцінну гру з нуля: персонаж, колізії, анімації, UI, аудіо та чистий код на C#.</div>
         </div>
       </div>
-
-      <!-- ВІДЕО 2: Code Monkey — мультиплеєр Unity Netcode -->
-      <!-- 7glCsF9fv3s — ID відео на YouTube -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/7glCsF9fv3s"
@@ -814,9 +166,6 @@ body > .scratch-layer {
           <div class="vid-desc">Перетворюємо одиночну гру на мережеву за допомогою Unity Netcode та Relay — без виділеного сервера.</div>
         </div>
       </div>
-
-      <!-- ВІДЕО 3: Code Monkey — C# від початківця до просунутого -->
-      <!-- qZpMX8Re_2Q — ID відео на YouTube -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/qZpMX8Re_2Q"
@@ -830,9 +179,6 @@ body > .scratch-layer {
           <div class="vid-desc">95 лекцій: змінні, ООП, інтерфейси, події, Reflection, Async та Multithreading — все орієнтовано на геймдев.</div>
         </div>
       </div>
-
-      <!-- ВІДЕО 4: Платформер у стилі Super Mario Bros -->
-      <!-- SDY4oRKBosk — ID відео на YouTube -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/SDY4oRKBosk"
@@ -846,9 +192,6 @@ body > .scratch-layer {
           <div class="vid-desc">Покрокове створення класичного 2D-платформера: персонаж, рівні, вороги. Всі ресурси безкоштовні (OpenGameArt).</div>
         </div>
       </div>
-
-      <!-- ВІДЕО 5: Code Monkey — Unity DOTS для максимальної продуктивності -->
-      <!-- 1gSnTlUjs-s — ID відео на YouTube -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/1gSnTlUjs-s"
@@ -862,9 +205,6 @@ body > .scratch-layer {
           <div class="vid-desc">DOTS дозволяє коду працювати у 200x швидше. ECS, Job System та Burst Compiler на прикладі стратегії RTS.</div>
         </div>
       </div>
-
-      <!-- ВІДЕО 6: Code Monkey — C# просунутий рівень -->
-      <!-- 6G-4oPDxfNI — ID відео на YouTube -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/6G-4oPDxfNI"
@@ -878,7 +218,6 @@ body > .scratch-layer {
           <div class="vid-desc">Поглиблені теми C#: рефлексія, асинхронне програмування та багатопоточність — важливо для оптимізації ігрових систем.</div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
@@ -897,7 +236,6 @@ body > .scratch-layer {
       </div>
     </div>
     <div class="eng-grid">
-      <!-- Клас "rec" додає значок "рекомендовано" -->
       <div class="eng-card rec">
         <span class="eng-icon">🎮</span>
         <div class="eng-name">Unity</div>
@@ -910,7 +248,6 @@ body > .scratch-layer {
           <li>Shader Graph — візуальний редактор шейдерів</li>
           <li>Легка розробка під мобайл та браузер</li>
         </ul>
-        <!-- style="width:82%" — цільове значення для CSS-анімації growBar -->
         <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Легкість входу</span><span>82%</span></div><div class="eng-bar"><div class="eng-fill" style="width:82%"></div></div></div>
         <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Продуктивність</span><span>78%</span></div><div class="eng-bar"><div class="eng-fill" style="width:78%"></div></div></div>
         <div class="eng-bar-wrap"><div class="eng-bar-row"><span>Екосистема</span><span>97%</span></div><div class="eng-bar"><div class="eng-fill" style="width:97%"></div></div></div>
@@ -1196,7 +533,6 @@ body > .scratch-layer {
     <div class="author-grid">
       <div>
         <div class="author-frame">👾</div>
-        <!-- Декоративна карта з сіткою і координатами -->
         <div class="author-map">
           <div class="map-lines"></div>
           <div class="map-cnt">
@@ -1262,7 +598,6 @@ body > .scratch-layer {
     <div>
       <div class="f-col-h">Контакти</div>
       <ul class="f-links">
-        <!-- href="mailto:" — відкриває поштовий клієнт при кліку -->
         <li><a href="mailto:ipz251_dvs@student.ztu.edu.ua">ipz251_dvs@student.ztu.edu.ua</a></li>
         <li><a href="#">Discord сервер</a></li>
         <li><a href="#">itch.io профіль</a></li>
@@ -1280,283 +615,15 @@ body > .scratch-layer {
 </footer>
 
 <!-- ======================================================
-     ОВЕРЛЕЙ — повна стаття (відкривається поверх сторінки)
-     JS додає/видаляє клас .open для показу/приховування
+     ОВЕРЛЕЙ — повна стаття
      ====================================================== -->
 <div class="overlay" id="overlay">
   <button class="ov-close" onclick="closeArt()">✕ Закрити</button>
   <div class="art-full" id="artContent"></div>
 </div>
 
-<!-- ======================================================
-     JAVASCRIPT
-     ====================================================== -->
-<script>
-/* --------------------------------------------------------
-   СМУЖКА ПРОГРЕСУ ПРОКРУТКИ
-   Слухаємо подію scroll і рахуємо % прокрутки сторінки
-   -------------------------------------------------------- */
-window.addEventListener('scroll', () => {
-  const doc = document.documentElement;
-  // (прокручено) / (максимум прокрутки) * 100 = відсоток
-  const pct = doc.scrollTop / (doc.scrollHeight - doc.clientHeight) * 100;
-  document.getElementById('scrollLine').style.width = pct + '%';
-});
-
-/* --------------------------------------------------------
-   ПІДПИСКА НА РОЗСИЛКУ
-   Проста клієнтська валідація email
-   -------------------------------------------------------- */
-function subscribe() {
-  const email = document.getElementById('emailInput').value;
-  const msg   = document.getElementById('subMsg');
-
-  // Базова перевірка: поле не пусте і містить "@"
-  if (!email || !email.includes('@')) {
-    msg.style.color = '#b52b2b';           // червоний текст при помилці
-    msg.textContent = '⚠ Введіть коректну email-адресу';
-    return; // припиняємо виконання функції
-  }
-
-  // Успішна підписка
-  msg.style.color = '#4a7a3a';             // зелений текст при успіху
-  msg.textContent = '✓ Дякуємо! Ви підписані на PIXELFORGE BLOG';
-  document.getElementById('emailInput').value = ''; // очищаємо поле
-}
-
-/* --------------------------------------------------------
-   ДАНІ СТАТЕЙ
-   Кожен ключ — унікальний ID статті.
-   Структура: { tag, title, meta[], body (HTML-рядок) }
-   -------------------------------------------------------- */
-const arts = {
-
-  /* === Стаття: Фізика в Unity === */
-  physics: {
-    tag:   'Unity · Фізика',
-    title: 'Повний гайд по фізиці в Unity 6: Rigidbody, колізії та фізичні матеріали',
-    meta:  ['12 червня 2025', '18 хв читання', '4 200 переглядів', 'Автор: Владислав Демчук'],
-    body: `
-<h2>Навіщо розуміти фізику?</h2>
-<p>Більшість початківців у Unity просто додають Rigidbody до об'єкта і сподіваються, що «воно само запрацює». Перший час це дійсно так. Але коли гра ускладнюється — персонаж застряє в стінах, об'єкти тремтять, колізії спрацьовують невчасно. Ця стаття допоможе розібратися з фізикою Unity раз і назавжди.</p>
-<h2>Rigidbody: основи та підводні камені</h2>
-<p>Rigidbody — компонент, що передає управління об'єктом фізичному движку. Без нього об'єкт статичний, з ним — підпорядковується гравітації та силам.</p>
-<p><strong>Collision Detection Mode</strong> — критичний параметр. Discrete (за замовчуванням) перевіряє колізії раз на кадр. Для швидких об'єктів об'єкт може «пролетіти крізь стіну» між кадрами. Варіанти:</p>
-<ul>
-  <li><strong>Continuous</strong> — перевіряє між кадрами зі статичними колайдерами</li>
-  <li><strong>Continuous Dynamic</strong> — перевіряє і з іншими Rigidbody, але дорожче</li>
-  <li><strong>Continuous Speculative</strong> — найдешевший варіант для більшості задач</li>
-</ul>
-<div class="code-b"><span class="cm">// Оголошення компонента фізики як поля класу</span>
-<span class="kw">private</span> Rigidbody rb;
-
-<span class="kw">void</span> Start() {
-    <span class="cm">// Кешуємо посилання в Start(), а не в Update() — для продуктивності</span>
-    rb = GetComponent&lt;Rigidbody&gt;();
-}
-
-<span class="kw">void</span> FixedUpdate() {
-    <span class="cm">// УВАГА: рух фізичних об'єктів — тільки у FixedUpdate!</span>
-    <span class="cm">// transform.position ламає фізику і колізії.</span>
-    Vector3 dir = <span class="kw">new</span> Vector3(Input.GetAxis(<span class="st">"Horizontal"</span>), 0, Input.GetAxis(<span class="st">"Vertical"</span>));
-    rb.MovePosition(rb.position + dir * speed * Time.fixedDeltaTime);
-}</div>
-<h2>Типи Collider</h2>
-<ul>
-  <li><strong>Box Collider</strong> — найшвидший, ідеальний для платформ</li>
-  <li><strong>Sphere Collider</strong> — для куль і снарядів</li>
-  <li><strong>Capsule Collider</strong> — стандарт для персонажів</li>
-  <li><strong>Mesh Collider</strong> — точний, але повільний. Не використовуй для рухомих об'єктів!</li>
-</ul>
-<div class="tip-b"><p>Кілька Box/Sphere Collider на одному об'єкті дешевші, ніж один Mesh Collider з сотнями полігонів.</p></div>
-<h2>Physics Materials</h2>
-<div class="code-b"><span class="cm">// Програмне створення фізичного матеріалу "лід"</span>
-PhysicMaterial ice = <span class="kw">new</span> PhysicMaterial(<span class="st">"Ice"</span>);
-ice.dynamicFriction = 0.05f; <span class="cm">// тертя під час руху</span>
-ice.staticFriction  = 0.05f; <span class="cm">// тертя в стані спокою</span>
-ice.bounciness      = 0.0f;  <span class="cm">// пружність (0 = не відскакує)</span>
-ice.frictionCombine = PhysicMaterialCombine.Minimum;
-GetComponent&lt;Collider&gt;().material = ice;</div>
-<h2>Висновки</h2>
-<p>Переміщай об'єкти через FixedUpdate та методи Rigidbody, використовуй примітивні колайдери, правильно налаштовуй Collision Detection Mode. Ці три правила вирішать 90% проблем з фізикою.</p>`
-  },
-
-  /* === Стаття: Шейдери === */
-  shaders: {
-    tag:   'Шейдери · HLSL',
-    title: 'HLSL шейдери в Unity: від нуля до ефекту дощу на склі',
-    meta:  ['20 травня 2025', '22 хв читання', '3 800 переглядів', 'Автор: Владислав Демчук'],
-    body: `
-<h2>Що таке шейдери?</h2>
-<p>Шейдер — це програма, що виконується на відеокарті (GPU) і визначає, як рендерити кожен піксель. Unity надає Shader Graph для візуального редагування, але код відкриває більше можливостей.</p>
-<h2>Структура URP-шейдера</h2>
-<div class="code-b">Shader <span class="st">"Custom/RainOnGlass"</span> {
-    Properties {
-        <span class="cm">// Параметри видно в Inspector Unity</span>
-        _MainTex    (<span class="st">"Текстура"</span>,      2D)    = <span class="st">"white"</span> {}
-        _RainSpeed  (<span class="st">"Швидкість"</span>,     Float) = 1.0
-        _DropSize   (<span class="st">"Розмір краплі"</span>, Float) = 0.5
-        _Distortion (<span class="st">"Спотворення"</span>,  Float) = 0.02
-    }
-    SubShader {
-        Tags { <span class="st">"RenderType"</span>=<span class="st">"Transparent"</span> }
-        Pass {
-            HLSLPROGRAM
-            <span class="kw">#pragma</span> vertex vert   <span class="cm">// точка входу вершинного шейдера</span>
-            <span class="kw">#pragma</span> fragment frag <span class="cm">// точка входу фрагментного шейдера</span>
-            ENDHLSL
-        }
-    }
-}</div>
-<h2>Функція краплі дощу</h2>
-<div class="code-b"><span class="cm">// Повертає "маску" краплі в позиції UV</span>
-<span class="kw">float2</span> RainDrop(<span class="kw">float2</span> uv, <span class="kw">float</span> t) {
-    uv.y += t * _RainSpeed;            <span class="cm">// анімуємо рух вниз</span>
-    <span class="kw">float2</span> cell = floor(uv);           <span class="cm">// яка клітинка сітки</span>
-    <span class="kw">float2</span> pos  = frac(uv);            <span class="cm">// позиція всередині клітинки [0..1]</span>
-    <span class="kw">float2</span> drop = hash(cell)*0.6+0.2;  <span class="cm">// псевдовипадкова позиція краплі</span>
-    <span class="kw">float</span>  dist = length(pos - drop);  <span class="cm">// відстань від поточного пікселя</span>
-    <span class="kw">return</span> smoothstep(_DropSize, 0.0, dist); <span class="cm">// м'який круглий край</span>
-}</div>
-<div class="tip-b"><p>Обчислюй дорогі функції (шум, хеш) у vertex shader і передавай через varying — GPU обробляє вершини набагато рідше ніж пікселі.</p></div>
-<h2>Заломлення через зміщення UV</h2>
-<div class="code-b"><span class="cm">// Градієнт краплі дає напрямок "лінзи"</span>
-<span class="kw">float2</span> offset = <span class="kw">float2</span>(ddy(drop), ddx(drop)) * _Distortion;
-<span class="kw">float4</span> bg = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offset);
-<span class="kw">return</span> bg; <span class="cm">// пікселі фону зміщені — ефект скла</span></div>`
-  },
-
-  /* === Стаття: Godot === */
-  godot: {
-    tag:   'Godot 4 · Огляд',
-    title: 'Godot 4 у 2025: чи варто переходити з Unity після скандалу з Runtime Fee?',
-    meta:  ['28 травня 2025', '10 хв читання', '3 100 переглядів', 'Автор: Владислав Демчук'],
-    body: `
-<h2>Що трапилось у вересні 2023?</h2>
-<p>Unity оголосила Runtime Fee — плату за кожну установку гри. Спільнота відреагувала різко: сотні студій оголосили перехід на альтернативи, Godot отримав рекордні пожертвування. Unity відкликала анонс, але довіра була підірвана.</p>
-<h2>Що нового у Godot 4</h2>
-<ul>
-  <li><strong>Vulkan рендерер</strong> — значно потужніший за попередній OpenGL</li>
-  <li><strong>GDScript 2.0</strong> — типізація, лямбди, краща продуктивність</li>
-  <li><strong>C# через .NET 6</strong> — повноцінна підтримка</li>
-  <li><strong>Покращений 3D</strong> — PBR матеріали та глобальне освітлення</li>
-</ul>
-<h2>GDScript — простий синтаксис</h2>
-<div class="code-b"><span class="cm"># Рух персонажа у Godot 4 — мінімум коду</span>
-<span class="kw">extends</span> CharacterBody2D
-
-<span class="kw">const</span> SPEED = 200.0  <span class="cm"># пікселів на секунду</span>
-<span class="kw">const</span> JUMP  = -400.0 <span class="cm"># від'ємне = вгору</span>
-
-<span class="kw">func</span> _physics_process(delta):
-    <span class="kw">if not</span> is_on_floor():
-        velocity.y += get_gravity().y * delta <span class="cm"># гравітація</span>
-    <span class="kw">if</span> Input.is_action_just_pressed(<span class="st">"jump"</span>) and is_on_floor():
-        velocity.y = JUMP  <span class="cm"># стрибок</span>
-    <span class="kw">var</span> dir = Input.get_axis(<span class="st">"left"</span>, <span class="st">"right"</span>)
-    <span class="cm"># тернарний оператор: рухаємось або гальмуємо</span>
-    velocity.x = dir * SPEED if dir else move_toward(velocity.x, 0, SPEED)
-    move_and_slide() <span class="cm"># вбудований рух з колізіями</span></div>
-<div class="tip-b"><p>Для 2D-ігор у 2025 Godot 4 — серйозна альтернатива. Для складного 3D Unity досі має більше ресурсів та інструментів.</p></div>`
-  },
-
-  /* === Туторіал 1 === */
-  t1: {
-    tag:   'Туторіал · Початківці',
-    title: 'Unity з нуля: перша 2D-платформерна гра за 7 днів',
-    meta:  ['Туторіал', '4.5 годин', 'Unity 6', 'Початківець'],
-    body: `
-<h2>Що ми створимо</h2>
-<p>Повноцінна 2D-платформерна гра: персонаж з анімацією, платформи, ворог, збирання монет, підрахунок очок. Наприкінці — публікація на itch.io.</p>
-<h2>День 1: Встановлення та інтерфейс</h2>
-<p>Завантажуємо Unity Hub з unity.com/download. Обираємо шаблон «2D (URP)». Знайомимося з вікнами: Scene View, Hierarchy, Inspector, Project Window, Console.</p>
-<h2>День 2: Персонаж та рух</h2>
-<div class="code-b"><span class="kw">public class</span> PlayerController : MonoBehaviour {
-    [SerializeField] <span class="kw">float</span> speed = 8f;  <span class="cm">// видно в Inspector</span>
-    [SerializeField] <span class="kw">float</span> jump  = 12f;
-    Rigidbody2D rb;  <span class="cm">// компонент фізики</span>
-    <span class="kw">bool</span> grounded;   <span class="cm">// чи стоїть на землі</span>
-
-    <span class="kw">void</span> Start() { rb = GetComponent&lt;Rigidbody2D&gt;(); }
-
-    <span class="kw">void</span> Update() {
-        <span class="cm">// GetAxisRaw: чіткіший рух (-1, 0 або 1)</span>
-        <span class="kw">float</span> h = Input.GetAxisRaw(<span class="st">"Horizontal"</span>);
-        rb.velocity = <span class="kw">new</span> Vector2(h * speed, rb.velocity.y);
-        <span class="kw">if</span> (Input.GetKeyDown(KeyCode.Space) && grounded) {
-            rb.AddForce(Vector2.up * jump, ForceMode2D.Impulse);
-            grounded = <span class="kw">false</span>; <span class="cm">// блокуємо повторний стрибок</span>
-        }
-    }
-    <span class="kw">void</span> OnCollisionEnter2D(Collision2D c) {
-        <span class="cm">// Перевіряємо тег об'єкта, з яким зіткнулися</span>
-        <span class="kw">if</span> (c.gameObject.CompareTag(<span class="st">"Ground"</span>)) grounded = <span class="kw">true</span>;
-    }
-}</div>
-<h2>Дні 3–4: Анімація через Animator</h2>
-<p>Нарізаємо спрайт-аркуш через Sprite Editor. Створюємо Animation Clips: Idle, Run, Jump. В Animator Controller налаштовуємо переходи через параметри Speed та IsGrounded.</p>
-<h2>День 5: Монети та рахунок</h2>
-<p>Prefab монети з Collider2D (IsTriger = true). GameManager зберігає рахунок — клас Singleton (один екземпляр на всю гру). Canvas + TextMeshPro відображає поточний рахунок.</p>
-<h2>Дні 6–7: Ворог і публікація</h2>
-<p>Простий ворог патрулює між двома точками. Удар зверху — вмирає. Удар збоку — гравець втрачає HP. Публікація: File → Build Settings → WebGL → Build → itch.io upload.</p>`
-  }
-};
-
-/* --------------------------------------------------------
-   ВІДКРИТТЯ ОВЕРЛЕЮ ЗІ СТАТТЕЮ
-   Знаходимо дані за ID, вставляємо HTML і показуємо оверлей
-   -------------------------------------------------------- */
-function openArt(id) {
-  const art = arts[id];
-  if (!art) return; // якщо ID не знайдено — нічого не робимо
-
-  // Будуємо HTML для оверлею з даних статті
-  document.getElementById('artContent').innerHTML = `
-    <div class="af-tag">${art.tag}</div>
-    <h1 class="af-title">${art.title}</h1>
-    <div class="af-meta">${art.meta.map(m => `<span>${m}</span>`).join('')}</div>
-    <div class="abody">${art.body}</div>
-  `;
-
-  document.getElementById('overlay').classList.add('open'); // показуємо оверлей
-  document.getElementById('overlay').scrollTop = 0;        // прокручуємо на початок
-  document.body.style.overflow = 'hidden';                 // блокуємо фон
-}
-
-/* --------------------------------------------------------
-   ЗАКРИТТЯ ОВЕРЛЕЮ
-   -------------------------------------------------------- */
-function closeArt() {
-  document.getElementById('overlay').classList.remove('open');
-  document.body.style.overflow = ''; // відновлюємо прокрутку
-}
-
-// Дозволяємо закривати оверлей клавішею Escape
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeArt();
-});
-
-/* --------------------------------------------------------
-   АНІМАЦІЯ ШКАЛ ДВИЖКІВ
-   IntersectionObserver стежить за видимістю карток.
-   Коли картка з'являється у viewport — перезапускаємо анімацію.
-   -------------------------------------------------------- */
-const engineObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      // Перебираємо всі шкали в картці
-      entry.target.querySelectorAll('.eng-fill').forEach(bar => {
-        const targetWidth = bar.style.width; // зберігаємо цільову ширину (наприклад "82%")
-        bar.style.width = '0';              // скидаємо
-        // Через 80ms повертаємо — це перезапускає CSS-анімацію growBar
-        setTimeout(() => { bar.style.width = targetWidth; }, 80);
-      });
-    }
-  });
-}, { threshold: 0.3 }); // спрацьовує коли 30% картки у зоні видимості
-
-// Підключаємо спостерігача до кожної картки движка
-document.querySelectorAll('.eng-card').forEach(card => engineObserver.observe(card));
-</script>
+<!-- JS підключаємо в кінці body: спочатку дані, потім логіка -->
+<script src="js/articles.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
