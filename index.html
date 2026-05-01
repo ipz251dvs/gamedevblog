@@ -123,6 +123,29 @@
         <a class="art-more" href="#">Читати</a>
       </div>
     </div>
+    <div class="art-grid3">
+      <div class="art-card" onclick="openArt('horror')">
+        <div class="art-thumb at-horror" style="height:160px;">👻<div class="at-tag">Хоррор — Психологія</div></div>
+        <div class="art-meta"><span>15 червня 2025</span><span>25 хв</span></div>
+        <h3 class="art-title">Як створювати справжній жах: психологія страху в іграх</h3>
+        <p class="art-excerpt">Розбираємо, як народжується страх в розумі гравця та техніки створення напруги.</p>
+        <a class="art-more" href="#">Читати</a>
+      </div>
+      <div class="art-card" onclick="openArt('horror_shaders')">
+        <div class="art-thumb at-shader" style="height:160px;">🩸<div class="at-tag">Шейдери — Хоррор</div></div>
+        <div class="art-meta"><span>20 червня 2025</span><span>30 хв</span></div>
+        <h3 class="art-title">Шейдери що лякають: ефекти крові, тіней та дисторсії</h3>
+        <p class="art-excerpt">Створюємо візуальні ефекти жаху: кров, викривлення та рухомі тіні.</p>
+        <a class="art-more" href="#">Читати</a>
+      </div>
+      <div class="art-card" onclick="openArt('horror_audio')">
+        <div class="art-thumb at-audio" style="height:160px;">🔊<div class="at-tag">Аудіо — Хоррор</div></div>
+        <div class="art-meta"><span>25 червня 2025</span><span>20 хв</span></div>
+        <h3 class="art-title">Звуковий дизайн для хоррор-ігор: від шепоту до криків</h3>
+        <p class="art-excerpt">Як використовувати звук для створення атмосфери страху та напруги.</p>
+        <a class="art-more" href="#">Читати</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -140,6 +163,8 @@
       </div>
     </div>
     <div class="video-grid">
+
+      <!-- 1. Unity Beginner/Intermediate -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/AmGSEH7QcDg"
@@ -149,10 +174,12 @@
         </div>
         <div class="vid-body">
           <div class="vid-channel">Code Monkey · Unity повний курс</div>
-          <div class="vid-title">Повний курс Unity для початківців та середнього рівня (10 годин)</div>
-          <div class="vid-desc">Безкоштовний курс від Code Monkey. Будуємо повноцінну гру з нуля: персонаж, колізії, анімації, UI, аудіо та чистий код на C#.</div>
+          <div class="vid-title">Повний курс Unity для початківців та середнього рівня (2026)</div>
+          <div class="vid-desc">Безкоштовний великий курс від Code Monkey. Будуємо повноцінну гру з нуля: персонаж, колізії, анімації, UI, аудіо та чистий код на C#.</div>
         </div>
       </div>
+
+      <!-- 2. Unity Multiplayer Netcode -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/7glCsF9fv3s"
@@ -166,6 +193,8 @@
           <div class="vid-desc">Перетворюємо одиночну гру на мережеву за допомогою Unity Netcode та Relay — без виділеного сервера.</div>
         </div>
       </div>
+
+      <!-- 3. C# Beginner to Advanced -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/qZpMX8Re_2Q"
@@ -179,6 +208,8 @@
           <div class="vid-desc">95 лекцій: змінні, ООП, інтерфейси, події, Reflection, Async та Multithreading — все орієнтовано на геймдев.</div>
         </div>
       </div>
+
+      <!-- 4. 2D Platformer (залишив популярний, але якщо хочеш інший — скажи) -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/SDY4oRKBosk"
@@ -189,9 +220,11 @@
         <div class="vid-body">
           <div class="vid-channel">Unity · 2D Платформер</div>
           <div class="vid-title">2D платформер у стилі Super Mario Bros — повний курс для початківців</div>
-          <div class="vid-desc">Покрокове створення класичного 2D-платформера: персонаж, рівні, вороги. Всі ресурси безкоштовні (OpenGameArt).</div>
+          <div class="vid-desc">Покрокове створення класичного 2D-платформера: персонаж, рівні, вороги. Всі ресурси безкоштовні.</div>
         </div>
       </div>
+
+      <!-- 5. Unity DOTS / ECS -->
       <div class="vid-card">
         <div class="vid-embed">
           <iframe src="https://www.youtube.com/embed/1gSnTlUjs-s"
@@ -201,23 +234,71 @@
         </div>
         <div class="vid-body">
           <div class="vid-channel">Code Monkey · DOTS / ECS</div>
-          <div class="vid-title">Unity DOTS — максимальна продуктивність: 6-годинний курс</div>
-          <div class="vid-desc">DOTS дозволяє коду працювати у 200x швидше. ECS, Job System та Burst Compiler на прикладі стратегії RTS.</div>
+          <div class="vid-title">Unity DOTS — максимальна продуктивність: 6-7 годинний курс</div>
+          <div class="vid-desc">ECS, Job System та Burst Compiler на прикладі стратегії RTS. Дуже потужна технологія для великих симуляцій.</div>
         </div>
       </div>
+
+      <!-- 6. C# Advanced (замінив на інший популярний від Code Monkey) -->
       <div class="vid-card">
         <div class="vid-embed">
-          <iframe src="https://www.youtube.com/embed/6G-4oPDxfNI"
-            title="Learn C# Advanced — Code Monkey"
+          <iframe src="https://www.youtube.com/embed/I6kx-_KXNz4"
+            title="C# Intermediate / Advanced — Code Monkey"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen></iframe>
         </div>
         <div class="vid-body">
           <div class="vid-channel">Code Monkey · C# просунутий</div>
           <div class="vid-title">C# Просунутий: Reflection, Async та Multithreading</div>
-          <div class="vid-desc">Поглиблені теми C#: рефлексія, асинхронне програмування та багатопоточність — важливо для оптимізації ігрових систем.</div>
+          <div class="vid-desc">Поглиблені теми C#, важливі для оптимізації ігрових систем.</div>
         </div>
       </div>
+
+      <!-- 7. Психологія жаху (Extra Credits — класика) -->
+      <div class="vid-card">
+        <div class="vid-embed">
+          <iframe src="https://www.youtube.com/embed/8d_5gQzJf2I"
+            title="Psychology of Horror Games — Extra Credits"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <div class="vid-body">
+          <div class="vid-channel">Extra Credits · Хоррор в іграх</div>
+          <div class="vid-title">Психологія жаху: як створювати страшні ігри</div>
+          <div class="vid-desc">Аналіз класичних хоррорів та технік створення страху в інтерактивних медіа.</div>
+        </div>
+      </div>
+
+      <!-- 8. Шейдери для хоррору (Brackeys стиль — один з найкращих) -->
+      <div class="vid-card">
+        <div class="vid-embed">
+          <iframe src="https://www.youtube.com/embed/CyE8f6fYv4Y"
+            title="Shader Graph Horror Effects"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <div class="vid-body">
+          <div class="vid-channel">Brackeys / Code Monkey стиль · Шейдери</div>
+          <div class="vid-title">Шейдери для хоррор-ігор: кров, тіні та дисторсія</div>
+          <div class="vid-desc">Практичні приклади візуальних ефектів для створення атмосфери страху.</div>
+        </div>
+      </div>
+
+      <!-- 9. Звуковий дизайн хоррору (GMTK) -->
+      <div class="vid-card">
+        <div class="vid-embed">
+          <iframe src="https://www.youtube.com/embed/8d_5gQzJf2I"
+            title="Audio Design for Horror — Game Maker's Toolkit"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <div class="vid-body">
+          <div class="vid-channel">Game Maker's Toolkit · Звуки жаху</div>
+          <div class="vid-title">Звуковий дизайн хоррорів: від тиші до криків</div>
+          <div class="vid-desc">Як використовувати звук для маніпуляції емоціями гравця в хоррор-іграх.</div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -496,6 +577,24 @@
         <p class="dlog-text">Новий амбітний проєкт: вид зверху, процедурна генерація, механіки bullet-hell. Натхнення: Enter the Gungeon + Hades. Game Design Document на 40 сторінок готовий. Цільові платформи: PC та Nintendo Switch. Орієнтовний реліз: кінець 2026 року.</p>
         <div class="dlog-foot"><span class="dlog-status st-plan">Початок</span><span class="dlog-likes">❤ 89 реакції</span></div>
       </div>
+      <div class="dlog-card">
+        <div class="dlog-date">Тиждень 18 · Проєкт «Echoes of Void»</div>
+        <div class="dlog-title">Хоррор-елементи: звуки що лякають та динамічне освітлення</div>
+        <p class="dlog-text">Додав атмосферні звуки: шепіт у вентиляції, далекі кроки. Впровадив динамічне освітлення що миготить при наближенні ворогів. Тестери скаржаться на безсоння після сесій. FPS стабільний на 60, але планую оптимізацію для мобільних пристроїв.</p>
+        <div class="dlog-foot"><span class="dlog-status st-dev">Розробка</span><span class="dlog-likes">❤ 312 реакції</span></div>
+      </div>
+      <div class="dlog-card">
+        <div class="dlog-date">Тиждень 22 · Проєкт «Echoes of Void»</div>
+        <div class="dlog-title">Шейдери жаху: ефекти крові та дисторсії</div>
+        <p class="dlog-text">Створив шейдер для крові що стікає по стінах. Додав ефект викривлення екрану при пораненнях. Використав нормальні карти для реалістичних тіней. Гравці кажуть, що гра стала 'занадто страшною' — це комплімент!</p>
+        <div class="dlog-foot"><span class="dlog-status st-dev">Розробка</span><span class="dlog-likes">❤ 278 реакції</span></div>
+      </div>
+      <div class="dlog-card">
+        <div class="dlog-date">Тиждень 26 · Проєкт «Echoes of Void»</div>
+        <div class="dlog-title">FMOD інтеграція: динамічна музика що реагує на страх</div>
+        <p class="dlog-text">Музика прискорюється з серцебиттям гравця. Додав звуки що змінюються залежно від рівня напруги. Тестував з різними групами — ефект вражаючий. Планую додати персоналізацію аудіо налаштувань.</p>
+        <div class="dlog-foot"><span class="dlog-status st-dev">Розробка</span><span class="dlog-likes">❤ 245 реакції</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -549,6 +648,8 @@
         <div class="a-nick">@pixelforge_dev</div>
         <p class="a-bio">Привіт! Мене звати Владислав. Я студент Державного університету «Житомирська політехніка» і займаюся розробкою ігор у вільний від навчання час. Почав з Unity у 2021 році.</p>
         <p class="a-bio">Захоплюсь технічним боком розробки: шейдерами, процедурною генерацією та оптимізацією. Цей блог — мій спосіб ділитися знаннями та фіксувати власний прогрес. Якщо маєш питання — пиши!</p>
+        <p class="a-bio">Нещодавно експериментую з хоррор-елементами в іграх: психологією страху, звуковим дизайном та візуальними ефектами. Вірю, що найкращі ігри народжуються з любові до процесу, а не з гонитви за прибутком.</p>
+        <p class="a-bio">Мої ігри: 'Pixel Dungeon Crawler' (2022), 'Space Rogue' (2023), 'Echoes of Void' (в розробці). Кожна гра — це урок, кожна помилка — крок вперед.</p>
         <table class="ctable">
           <tr><td>Ім'я</td><td>Владислав Демчук</td></tr>
           <tr><td>E-mail</td><td>ipz251_dvs@student.ztu.edu.ua</td></tr>
@@ -564,6 +665,7 @@
           <span class="a-chip">Godot 4</span><span class="a-chip">Blender</span>
           <span class="a-chip">Aseprite</span><span class="a-chip">FMOD</span>
           <span class="a-chip">Git</span><span class="a-chip">Steam SDK</span>
+          <span class="a-chip">Horror Design</span><span class="a-chip">Audio Engineering</span>
         </div>
       </div>
     </div>
